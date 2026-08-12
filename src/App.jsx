@@ -179,6 +179,26 @@ export default function App() {
 
   const [errorMsg, setErrorMsg] = useState("");
   const fileInputRef = useRef(null);
+  const checklistRef = useRef(null);
+  const tabsWrapRef = useRef(null);
+  const tabRefs = useRef({});
+  const [tabIndicator, setTabIndicator] = useState({ left: 0, width: 0, ready: false });
+
+  const goToSubject = useCallback((key) => {
+    setActiveSubject(key);
+    checklistRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, []);
+
+  /* ---------------- sliding tab indicator ---------------- */
+  useEffect(() => {
+    const measure = () => {
+      const el = tabRefs.current[activeSubject];
+      if (el) setTabIndicator({ left: el.offsetLeft, width: el.offsetWidth, ready: true });
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [activeSubject]);
 
   /* ---------------- load from localStorage on mount ---------------- */
   useEffect(() => {
@@ -391,10 +411,14 @@ export default function App() {
             radial-gradient(ellipse 80% 60% at 50% 120%, rgba(124,58,237,0.15), transparent),
             var(--bg-void);
           color: var(--text);
-          min-height: 100vh;
+          min-height: 100svh;
+          width: 100%;
+          flex: 1;
+          text-align: left;
           padding: 20px 16px 60px;
           position: relative;
           overflow-x: hidden;
+          box-sizing: border-box;
         }
         .jt-root::before {
           content: '';
@@ -412,8 +436,19 @@ export default function App() {
         @keyframes shimmer { 0% { background-position: -200% 0;} 100% { background-position: 200% 0;} }
         @keyframes popIn { from { opacity: 0; transform: scale(0.85);} to { opacity: 1; transform: scale(1);} }
         @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes slideInDown { from { opacity: 0; transform: translateY(-18px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideInLeft { from { opacity: 0; transform: translateX(-48px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes slideInRight { from { opacity: 0; transform: translateX(48px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes slideInUpFade { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes barShimmer { 0% { transform: translateX(-120%); } 100% { transform: translateX(260%); } }
 
         .fade-in { animation: fadeInUp 0.5s ease both; }
+        .slide-down { animation: slideInDown 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
+        .slide-left { animation: slideInLeft 0.65s cubic-bezier(0.22, 1, 0.36, 1) both; }
+        .slide-up-1 { animation: slideInUpFade 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: 0.05s; }
+        .slide-up-2 { animation: slideInUpFade 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: 0.15s; }
+        .slide-up-3 { animation: slideInUpFade 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: 0.25s; }
+        .slide-right-stagger { animation: slideInRight 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
         /* ---------- top bar ---------- */
         .jt-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
@@ -511,7 +546,12 @@ export default function App() {
         .jt-mini-card .name { font-size: 12.5px; font-weight: 700; color: var(--text-dim); }
         .jt-mini-card .count { font-size: 11.5px; color: var(--text-faint); }
         .jt-bar-track { height: 7px; border-radius: 6px; background: rgba(255,255,255,0.08); overflow: hidden; }
-        .jt-bar-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--card-color, var(--purple-2)), var(--pink)); transition: width 0.6s ease; }
+        .jt-bar-fill { position: relative; height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--card-color, var(--purple-2)), var(--pink)); transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1); overflow: hidden; }
+        .jt-bar-fill::after {
+          content: ''; position: absolute; top: 0; left: 0; height: 100%; width: 40%;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+          animation: barShimmer 2.4s ease-in-out infinite;
+        }
 
         .jt-substat-row { display:flex; gap: 10px; margin-top: 4px; flex-wrap: wrap; }
         .jt-pill { font-size: 11px; padding: 5px 10px; border-radius: 999px; background: rgba(255,255,255,0.06); color: var(--text-dim); display:flex; gap:5px; align-items:center; }
@@ -560,14 +600,24 @@ export default function App() {
         .jt-log-del:hover { color: #fb7185; background: rgba(244,63,94,0.12); }
 
         /* ---------- subject tabs ---------- */
-        .jt-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+        .jt-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; position: relative; }
+        .jt-tab-indicator {
+          position: absolute; top: 0; left: 0; height: 100%;
+          border-radius: 11px;
+          background: linear-gradient(120deg, rgba(168,85,247,0.28), rgba(236,72,153,0.2));
+          border: 1px solid rgba(168,85,247,0.5);
+          box-shadow: 0 0 20px rgba(168,85,247,0.35);
+          transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+          pointer-events: none; z-index: 0;
+        }
         .jt-tab {
+          position: relative; z-index: 1;
           display: flex; align-items: center; gap: 7px;
           background: var(--bg-panel); border: 1px solid var(--border-soft); color: var(--text-dim);
-          padding: 9px 15px; border-radius: 11px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+          padding: 9px 15px; border-radius: 11px; font-size: 13px; font-weight: 600; cursor: pointer; transition: color 0.2s;
         }
         .jt-tab .badge { font-size: 10.5px; background: rgba(255,255,255,0.08); padding: 2px 7px; border-radius: 999px; }
-        .jt-tab.active { color: white; border-color: var(--tab-color); background: color-mix(in srgb, var(--tab-color) 22%, transparent); box-shadow: 0 0 18px color-mix(in srgb, var(--tab-color) 35%, transparent); }
+        .jt-tab.active { color: white; }
 
         /* ---------- filters ---------- */
         .jt-filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
@@ -591,7 +641,7 @@ export default function App() {
           display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
           background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.07);
           border-left: 3px solid rgba(255,255,255,0.12);
-          border-radius: 12px; padding: 12px 16px; animation: fadeInUp 0.35s ease both; transition: border-color 0.3s, background 0.2s;
+          border-radius: 12px; padding: 12px 16px; animation: slideInRight 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; transition: border-color 0.3s, background 0.2s;
         }
         .jt-chapter-row:hover { background: rgba(255,255,255,0.045); }
         .jt-chapter-row.complete { border-left-color: #34d399; background: rgba(52,211,153,0.05); }
@@ -600,6 +650,8 @@ export default function App() {
         .jt-chapter-tags { display: flex; gap: 6px; margin-top: 5px; }
         .jt-chapter-checks { display: flex; gap: 16px; align-items: center; }
         .jt-check { display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; font-size: 11.5px; color: var(--text-dim); }
+        .jt-check:focus-visible { outline: 2px solid var(--purple-2); outline-offset: 3px; border-radius: 6px; }
+        .jt-tab:focus-visible, .jt-icon-btn:focus-visible, .jt-btn-primary:focus-visible { outline: 2px solid var(--purple-2); outline-offset: 2px; }
         .jt-check-box {
           width: 19px; height: 19px; border-radius: 6px; border: 1.5px solid rgba(255,255,255,0.25);
           display: flex; align-items: center; justify-content: center; transition: all 0.2s; background: rgba(0,0,0,0.2);
@@ -702,284 +754,11 @@ export default function App() {
           .jt-hero-date-card { flex: 1 1 100%; }
           .jt-brand-title { font-size: 16.5px; }
         }
-
-
-        .jt-quick-nav {
-          display: flex;
-          justify-content: center;
-          gap: 7px;
-          margin: -7px auto 18px;
-          position: relative;
-          z-index: 2;
-        }
-        .jt-quick-nav a {
-          color: var(--text-faint);
-          text-decoration: none;
-          font-size: 11px;
-          font-weight: 700;
-          letter-spacing: .2px;
-          padding: 7px 11px;
-          border: 1px solid rgba(255,255,255,.065);
-          border-radius: 999px;
-          background: rgba(255,255,255,.025);
-          transition: .18s ease;
-        }
-        .jt-quick-nav a:hover {
-          color: var(--text);
-          border-color: rgba(192,132,252,.28);
-          background: rgba(168,85,247,.08);
-        }
-
-        /* ============================================================
-           POLISHED UI OVERRIDES — v2
-           ============================================================ */
-        html { scroll-behavior: smooth; }
-        body {
-          margin: 0;
-          background: #08050d;
-          color-scheme: dark;
-        }
-        button, input, select { font: inherit; }
-        button:focus-visible, input:focus-visible, select:focus-visible {
-          outline: 2px solid #c084fc;
-          outline-offset: 2px;
-        }
-
-        .jt-root {
-          --bg-void: #08050d;
-          --bg-panel: rgba(255,255,255,0.045);
-          --bg-panel-hover: rgba(255,255,255,0.075);
-          --border-soft: rgba(255,255,255,0.10);
-          --border-strong: rgba(192,132,252,0.30);
-          --purple-1: #7c3aed;
-          --purple-2: #a855f7;
-          --pink: #ec4899;
-          --gold: #fbbf24;
-          --text: #faf7ff;
-          --text-dim: #b8aec9;
-          --text-faint: #766b85;
-          min-height: 100svh;
-          padding: 22px 18px 70px;
-          background:
-            radial-gradient(900px 500px at 8% -8%, rgba(124,58,237,.22), transparent 65%),
-            radial-gradient(700px 420px at 92% 4%, rgba(236,72,153,.13), transparent 64%),
-            radial-gradient(700px 500px at 50% 110%, rgba(124,58,237,.12), transparent 68%),
-            #08050d;
-        }
-
-        .jt-shell { max-width: 1220px; }
-
-        .jt-root::before {
-          opacity: .45;
-          background-size: 30px 30px;
-        }
-
-        .jt-topbar {
-          position: sticky;
-          top: 12px;
-          z-index: 20;
-          padding: 9px 10px;
-          margin: -2px -10px 20px;
-          border: 1px solid rgba(255,255,255,.08);
-          border-radius: 16px;
-          background: rgba(10,6,16,.72);
-          backdrop-filter: blur(22px) saturate(140%);
-          -webkit-backdrop-filter: blur(22px) saturate(140%);
-          box-shadow: 0 12px 35px rgba(0,0,0,.22);
-        }
-
-        .jt-brand-badge {
-          width: 40px; height: 40px; border-radius: 12px;
-          background: linear-gradient(145deg,#8b5cf6,#ec4899);
-          box-shadow: 0 0 30px rgba(168,85,247,.34);
-        }
-
-        .jt-brand-title { letter-spacing: -.2px; }
-        .jt-brand-sub { color: #8f839e; }
-
-        .jt-icon-btn {
-          border-color: rgba(255,255,255,.10);
-          background: rgba(255,255,255,.045);
-          transition: transform .18s ease, background .18s ease, border-color .18s ease;
-        }
-        .jt-icon-btn:hover {
-          transform: translateY(-1px);
-          background: rgba(255,255,255,.08);
-          border-color: rgba(192,132,252,.35);
-        }
-
-        .jt-hero {
-          min-height: 250px;
-          display: flex;
-          align-items: center;
-          padding: 34px;
-          border: 1px solid rgba(192,132,252,.28);
-          border-radius: 24px;
-          background:
-            linear-gradient(135deg, rgba(124,58,237,.27), rgba(236,72,153,.13) 48%, rgba(255,255,255,.035)),
-            rgba(255,255,255,.025);
-          box-shadow: 0 25px 80px rgba(0,0,0,.24), inset 0 1px rgba(255,255,255,.07);
-        }
-        .jt-hero::before {
-          content: "";
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(110deg, transparent 20%, rgba(255,255,255,.045) 45%, transparent 70%);
-          transform: translateX(-120%);
-          animation: heroSheen 9s ease-in-out infinite;
-          pointer-events: none;
-        }
-        @keyframes heroSheen {
-          0%, 55% { transform: translateX(-120%); }
-          75%, 100% { transform: translateX(120%); }
-        }
-
-        .jt-hero-number {
-          font-size: clamp(64px, 9vw, 104px);
-          letter-spacing: -5px;
-          text-shadow: 0 0 50px rgba(168,85,247,.20);
-        }
-        .jt-hero-caption { max-width: 520px; line-height: 1.6; }
-
-        .jt-hero-date-card {
-          min-width: 165px;
-          background: rgba(5,2,10,.28);
-          border-color: rgba(255,255,255,.11);
-          transition: transform .2s ease, background .2s ease;
-        }
-        .jt-hero-date-card:hover {
-          transform: translateY(-3px);
-          background: rgba(5,2,10,.42);
-        }
-
-        .jt-panel {
-          border-color: rgba(255,255,255,.085);
-          background: linear-gradient(145deg, rgba(255,255,255,.045), rgba(255,255,255,.022));
-          box-shadow: 0 15px 45px rgba(0,0,0,.13), inset 0 1px rgba(255,255,255,.035);
-        }
-        .jt-panel-title { font-size: 15.5px; letter-spacing: -.15px; }
-        .jt-panel-sub { line-height: 1.5; }
-
-        .jt-ring-card,
-        .jt-mini-card,
-        .jt-analytics-stat {
-          box-shadow: inset 0 1px rgba(255,255,255,.035);
-        }
-
-        .jt-ring-card {
-          min-height: 122px;
-          border-color: rgba(192,132,252,.24);
-        }
-
-        .jt-mini-card {
-          position: relative;
-          overflow: hidden;
-        }
-        .jt-mini-card::after {
-          content: "";
-          position: absolute;
-          width: 100px; height: 100px;
-          right: -45px; top: -45px;
-          border-radius: 50%;
-          background: var(--card-color);
-          opacity: .08;
-          filter: blur(10px);
-          pointer-events: none;
-        }
-
-        .jt-bar-track { height: 8px; }
-        .jt-bar-fill {
-          box-shadow: 0 0 12px color-mix(in srgb, var(--card-color, #a855f7) 35%, transparent);
-        }
-
-        .jt-analytics-stat {
-          transition: transform .18s ease, border-color .18s ease;
-        }
-        .jt-analytics-stat:hover {
-          transform: translateY(-2px);
-          border-color: rgba(192,132,252,.25);
-        }
-
-        .jt-chart {
-          height: 165px;
-          padding-top: 12px;
-        }
-        .jt-chart-bar-wrap {
-          height: 120px;
-          border: 1px solid rgba(255,255,255,.045);
-        }
-
-        .jt-tabs {
-          position: sticky;
-          top: 82px;
-          z-index: 8;
-          padding: 7px;
-          margin: 0 -7px 16px;
-          border-radius: 14px;
-          background: rgba(10,6,16,.72);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-        }
-        .jt-tab {
-          border-color: rgba(255,255,255,.08);
-          transition: transform .18s ease, background .18s ease, border-color .18s ease;
-        }
-        .jt-tab:hover { transform: translateY(-1px); }
-
-        .jt-filters {
-          padding: 10px;
-          border-radius: 13px;
-          background: rgba(0,0,0,.16);
-          border: 1px solid rgba(255,255,255,.055);
-        }
-
-        .jt-chapter-row {
-          padding: 13px 15px;
-          border-color: rgba(255,255,255,.065);
-          background: rgba(255,255,255,.022);
-        }
-        .jt-chapter-row:hover {
-          border-color: rgba(192,132,252,.20);
-          transform: translateX(2px);
-        }
-        .jt-chapter-row.complete {
-          border-left-color: #34d399;
-          box-shadow: inset 0 0 30px rgba(52,211,153,.025);
-        }
-
-        .jt-check-box {
-          width: 20px; height: 20px;
-          border-radius: 6px;
-        }
-
-        .jt-footer {
-          max-width: 760px;
-          margin: 30px auto 0;
-          line-height: 1.6;
-        }
-
-        @media (max-width: 640px) {
-          .jt-root { padding: 10px 9px 44px; }
-          .jt-quick-nav { overflow-x: auto; justify-content: flex-start; padding: 0 2px 3px; }
-          .jt-quick-nav a { flex: 0 0 auto; }
-          .jt-topbar {
-            position: relative;
-            top: 0;
-            margin: 0 0 14px;
-            padding: 10px;
-          }
-          .jt-hero { padding: 23px 17px; min-height: 0; }
-          .jt-hero-number { letter-spacing: -3px; }
-          .jt-tabs { position: relative; top: 0; }
-          .jt-panel { margin-bottom: 13px; }
-          .jt-chapter-row:hover { transform: none; }
-        }
-
       `}</style>
 
       <div className="jt-shell">
         {/* ---------------- top bar ---------------- */}
-        <div className="jt-topbar fade-in">
+        <div className="jt-topbar slide-down">
           <div className="jt-brand">
             <div className="jt-brand-badge"><Target size={19} color="#fff" /></div>
             <div>
@@ -998,12 +777,6 @@ export default function App() {
           </div>
         </div>
 
-          <div className="jt-quick-nav" aria-label="Quick navigation">
-            <a href="#dashboard">Overview</a>
-            <a href="#hours">Study log</a>
-            <a href="#chapters">Syllabus</a>
-          </div>
-
         {errorMsg && (
           <div className="jt-error-banner fade-in">
             <span>{errorMsg}</span>
@@ -1012,7 +785,7 @@ export default function App() {
         )}
 
         {/* ---------------- countdown hero ---------------- */}
-        <div className="jt-hero fade-in">
+        <div className="jt-hero slide-left">
           <div className="jt-hero-inner">
             <div>
               <div className="jt-hero-label"><Zap size={14} /> Days left for mock-test phase</div>
@@ -1042,12 +815,12 @@ export default function App() {
         </div>
 
         {/* ---------------- dashboard ---------------- */}
-        <div id="dashboard" className="jt-panel fade-in">
+        <div className="jt-panel slide-up-1">
           <div className="jt-panel-title"><Award size={16} color="var(--gold)" /> Dashboard</div>
           <div className="jt-panel-sub">Overall syllabus progress, subject-wise</div>
 
           <div className="jt-stat-grid">
-            <div className="jt-ring-card">
+            <div className="jt-ring-card slide-right-stagger" style={{ animationDelay: "0.05s" }}>
               <div className="jt-ring">
                 <svg width="84" height="84">
                   <circle cx="42" cy="42" r="36" stroke="rgba(255,255,255,0.08)" strokeWidth="9" fill="none" />
@@ -1079,12 +852,24 @@ export default function App() {
                 const s = chemistryStats;
                 const pct = s.total ? Math.round((s.done / s.total) * 100) : 0;
                 return (
-                  <div key="chem" className="jt-mini-card" style={{ "--card-color": "#f472b6", "--card-glow": "rgba(244,114,182,0.35)" }}>
+                  <div
+                    key="chem"
+                    className="jt-mini-card slide-right-stagger"
+                    style={{ "--card-color": "#f472b6", "--card-glow": "rgba(244,114,182,0.35)", animationDelay: "0.15s" }}
+                    onClick={() => goToSubject("pc")}
+                  >
                     <div className="top"><span className="name">Chemistry (P+I+O)</span><span className="count">{s.done}/{s.total}</span></div>
                     <div className="jt-bar-track"><div className="jt-bar-fill" style={{ width: pct + "%" }} /></div>
                     <div className="jt-substat-row">
                       {["pc", "ioc", "oc"].map((k) => (
-                        <span key={k} className="jt-pill" style={{ color: SUBJECT_META[k].color }}>{SUBJECT_META[k].short} {subjectStats[k].done}/{subjectStats[k].total}</span>
+                        <span
+                          key={k}
+                          className="jt-pill"
+                          style={{ color: SUBJECT_META[k].color, cursor: "pointer" }}
+                          onClick={(e) => { e.stopPropagation(); goToSubject(k); }}
+                        >
+                          {SUBJECT_META[k].short} {subjectStats[k].done}/{subjectStats[k].total}
+                        </span>
                       ))}
                     </div>
                   </div>
@@ -1094,7 +879,12 @@ export default function App() {
               const pct = s.total ? Math.round((s.done / s.total) * 100) : 0;
               const meta = SUBJECT_META[key];
               return (
-                <div key={key} className="jt-mini-card" style={{ "--card-color": meta.color, "--card-glow": meta.glow }}>
+                <div
+                  key={key}
+                  className="jt-mini-card slide-right-stagger"
+                  style={{ "--card-color": meta.color, "--card-glow": meta.glow, animationDelay: `${0.05 + idx * 0.1}s` }}
+                  onClick={() => goToSubject(key)}
+                >
                   <div className="top"><span className="name">{meta.label}</span><span className="count">{s.done}/{s.total}</span></div>
                   <div className="jt-bar-track"><div className="jt-bar-fill" style={{ width: pct + "%" }} /></div>
                   <div className="jt-substat-row"><span className="jt-pill">{pct}% done</span></div>
@@ -1105,7 +895,7 @@ export default function App() {
         </div>
 
         {/* ---------------- study hours logger ---------------- */}
-        <div id="hours" className="jt-panel fade-in">
+        <div className="jt-panel slide-up-2">
           <div className="jt-panel-title"><Clock size={16} color="var(--purple-2)" /> Study Hours Log</div>
           <div className="jt-panel-sub">Log lecture-watching and self-study hours for any date</div>
 
@@ -1173,20 +963,31 @@ export default function App() {
         </div>
 
         {/* ---------------- chapter checklist ---------------- */}
-        <div id="chapters" className="jt-panel fade-in">
+        <div className="jt-panel slide-up-3" ref={checklistRef}>
           <div className="jt-panel-title"><BookOpen size={16} color="var(--purple-2)" /> Chapter Checklist</div>
           <div className="jt-panel-sub">Track chapter completion, DPPs and PYQs — chapter by chapter</div>
 
-          <div className="jt-tabs">
+          <div className="jt-tabs" ref={tabsWrapRef}>
+            {tabIndicator.ready && (
+              <div
+                className="jt-tab-indicator"
+                style={{ transform: `translateX(${tabIndicator.left}px)`, width: tabIndicator.width }}
+              />
+            )}
             {SUBJECT_KEYS.map((k) => {
               const meta = SUBJECT_META[k];
               const s = subjectStats[k];
               return (
                 <div
                   key={k}
+                  ref={(el) => { tabRefs.current[k] = el; }}
+                  role="tab"
+                  tabIndex={0}
+                  aria-selected={activeSubject === k}
                   className={`jt-tab ${activeSubject === k ? "active" : ""}`}
                   style={{ "--tab-color": meta.color }}
                   onClick={() => setActiveSubject(k)}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setActiveSubject(k); } }}
                 >
                   {meta.label} <span className="badge">{s.done}/{s.total}</span>
                 </div>
@@ -1232,14 +1033,18 @@ export default function App() {
             </label>
           </div>
 
-          <div className="jt-chapter-list">
+          <div className="jt-chapter-list" key={activeSubject}>
             {filteredChapters.length === 0 && <div className="jt-empty">No chapters match these filters.</div>}
-            {filteredChapters.map((c) => {
+            {filteredChapters.map((c, i) => {
               const state = chapterState[c.id] || {};
               const wc = W_COLORS[c.w];
               const dc = D_COLORS[c.d];
               return (
-                <div className={`jt-chapter-row ${state.completed ? "complete" : ""}`} key={c.id}>
+                <div
+                  className={`jt-chapter-row ${state.completed ? "complete" : ""}`}
+                  key={activeSubject + "-" + c.id}
+                  style={{ animationDelay: `${Math.min(i, 14) * 0.03}s` }}
+                >
                   <div className="jt-chapter-left">
                     <div className="jt-chapter-progress-dot">
                       <span className={state.completed ? "on" : ""} />
@@ -1255,15 +1060,36 @@ export default function App() {
                     </div>
                   </div>
                   <div className="jt-chapter-checks">
-                    <label className="jt-check" onClick={() => toggleField(c.id, "completed")}>
+                    <label
+                      className="jt-check"
+                      role="checkbox"
+                      aria-checked={!!state.completed}
+                      tabIndex={0}
+                      onClick={() => toggleField(c.id, "completed")}
+                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleField(c.id, "completed"); } }}
+                    >
                       <span className={`jt-check-box ${state.completed ? "on" : ""}`}>{state.completed && <CheckCircle2 size={13} color="#fff" />}</span>
                       Chapter
                     </label>
-                    <label className="jt-check" onClick={() => toggleField(c.id, "dpp")}>
+                    <label
+                      className="jt-check"
+                      role="checkbox"
+                      aria-checked={!!state.dpp}
+                      tabIndex={0}
+                      onClick={() => toggleField(c.id, "dpp")}
+                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleField(c.id, "dpp"); } }}
+                    >
                       <span className={`jt-check-box ${state.dpp ? "on" : ""}`}>{state.dpp && <CheckCircle2 size={13} color="#fff" />}</span>
                       DPP
                     </label>
-                    <label className="jt-check" onClick={() => toggleField(c.id, "pyq")}>
+                    <label
+                      className="jt-check"
+                      role="checkbox"
+                      aria-checked={!!state.pyq}
+                      tabIndex={0}
+                      onClick={() => toggleField(c.id, "pyq")}
+                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleField(c.id, "pyq"); } }}
+                    >
                       <span className={`jt-check-box ${state.pyq ? "on" : ""}`}>{state.pyq && <CheckCircle2 size={13} color="#fff" />}</span>
                       PYQ
                     </label>

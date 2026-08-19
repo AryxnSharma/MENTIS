@@ -848,7 +848,7 @@ export default function App() {
         /* ---------- scroll-triggered reveal (late, smooth, one-time) ---------- */
         .jt-reveal {
           will-change: opacity, transform;
-          transition: opacity 0.12s linear, transform 0.12s linear;
+          transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .jt-reveal-child { transform: translateY(22px); transition: transform 0.7s cubic-bezier(0.16,1,0.3,1); }
         .jt-reveal-child.revealed { transform: translateY(0); }

@@ -745,7 +745,7 @@ export default function App() {
     });
 
     ctx.fillStyle = "#8e8e93"; ctx.font = "600 22px Segoe UI, sans-serif";
-    ctx.fillText(`Generated ${formatNiceDate(todayStr())} · Target 240–250/300 · OBC-NCL`, 70, 1300);
+    ctx.fillText(`Generated ${formatNiceDate(todayStr())} · Target 240–250/300 `, 70, 1300);
 
     canvas.toBlob((blob) => {
       const url = URL.createObjectURL(blob);
@@ -941,7 +941,7 @@ export default function App() {
           position: absolute; top: -20%; left: -70%; width: 40%; height: 140%;
           background: linear-gradient(100deg, transparent, rgba(255,255,255,0.14), transparent);
           transform: skewX(-16deg);
-          animation: glassSheen 12s ease-in-out infinite 1.5s;
+          animation: glassSheen 1.2s ease-in-out 0.6s 1 forwards;
           pointer-events: none;
         }
         .jt-hero-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; position: relative; z-index: 1; }
@@ -986,7 +986,7 @@ export default function App() {
           position: absolute; top: -20%; left: -70%; width: 45%; height: 140%;
           background: linear-gradient(100deg, transparent, rgba(255,255,255,0.10), transparent);
           transform: skewX(-16deg);
-          animation: glassSheen 10s ease-in-out infinite;
+          animation: glassSheen 1.2s ease-in-out 0.3s 1 forwards;
           pointer-events: none;
         }
         .jt-panel:hover {
@@ -1392,7 +1392,7 @@ export default function App() {
               <div className="jt-hero-date-card">
                 <div className="k">Attempt</div>
                 <div className="v">3rd attempt</div>
-                <div className="v2">Target: 240–250 / 300 · OBC-NCL</div>
+                <div className="v2">Target: 240–250 / 300 </div>
               </div>
             </div>
           </div>

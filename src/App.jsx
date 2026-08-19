@@ -195,30 +195,47 @@ function levelForXp(xp) {
   return { level, into: xp - total, span: need, next: total + need };
 }
 
-/* ---------------- scroll-reveal hook: smooth, late, one-time reveal as
-   a section enters the viewport (used on every major panel below the fold) ---------------- */
-function useReveal(threshold = 0.15) {
+/* ---------------- scroll-linked reveal hook ----------------
+   Instead of firing a fixed-duration transition once a threshold is
+   crossed (which feels like a "pop" mid-scroll), this ties opacity/
+   transform directly to how far the element has travelled through a
+   reveal band in the viewport — so it moves in lockstep with the
+   scroll itself, frame by frame. Progress is monotonic (never reverses
+   once revealed) so scrolling back up doesn't cause flicker. */
+function useScrollProgress() {
   const ref = useRef(null);
-  const [visible, setVisible] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const maxProgress = useRef(0);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (typeof IntersectionObserver === "undefined") { setVisible(true); return; }
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setVisible(true);
-            io.unobserve(el);
-          }
-        });
-      },
-      { threshold, rootMargin: "0px 0px -80px 0px" }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [threshold]);
-  return [ref, visible];
+    if (typeof window === "undefined") return;
+    let ticking = false;
+    const compute = () => {
+      ticking = false;
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight || 800;
+      const bandStart = vh * 0.94;
+      const bandEnd = vh * 0.6;
+      const raw = (bandStart - rect.top) / (bandStart - bandEnd);
+      const clamped = Math.max(0, Math.min(1, raw));
+      if (clamped > maxProgress.current) {
+        maxProgress.current = clamped;
+        setProgress(clamped);
+      }
+    };
+    const onScroll = () => {
+      if (!ticking) { ticking = true; requestAnimationFrame(compute); }
+    };
+    compute();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
+  return [ref, progress];
 }
 
 /* ---------------- lightweight confetti burst (canvas, no deps) ---------------- */
@@ -320,11 +337,11 @@ export default function App() {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [ringAnimated, setRingAnimated] = useState(false);
 
-  const [dashRef, dashVisible] = useReveal();
-  const [focusRef, focusVisible] = useReveal();
-  const [hoursRef, hoursVisible] = useReveal();
-  const [mockRef, mockVisible] = useReveal();
-  const [checklistRevealRef, checklistVisible] = useReveal(0.05);
+  const [dashRef, dashProgress] = useScrollProgress();
+  const [focusRef, focusProgress] = useScrollProgress();
+  const [hoursRef, hoursProgress] = useScrollProgress();
+  const [mockRef, mockProgress] = useScrollProgress();
+  const [checklistRevealRef, checklistProgress] = useScrollProgress();
 
   const goToSubject = useCallback((key) => {
     setActiveSubject(key);
@@ -807,14 +824,11 @@ export default function App() {
 
         /* ---------- scroll-triggered reveal (late, smooth, one-time) ---------- */
         .jt-reveal {
-          opacity: 0;
-          transform: translateY(46px) scale(0.985);
-          transition: opacity 1.05s cubic-bezier(0.16, 1, 0.3, 1), transform 1.05s cubic-bezier(0.16, 1, 0.3, 1);
-          transition-delay: 0.08s;
+          will-change: opacity, transform;
+          transition: opacity 0.12s linear, transform 0.12s linear;
         }
-        .jt-reveal.revealed { opacity: 1; transform: translateY(0) scale(1); }
-        .jt-reveal-child { opacity: 0; transform: translateY(20px); transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1); }
-        .jt-reveal.revealed .jt-reveal-child { opacity: 1; transform: translateY(0); }
+        .jt-reveal-child { transform: translateY(22px); transition: transform 0.7s cubic-bezier(0.16,1,0.3,1); }
+        .jt-reveal-child.revealed { transform: translateY(0); }
 
         /* ---------- toast ---------- */
         .jt-toast {
@@ -1280,7 +1294,11 @@ export default function App() {
         </div>
 
         {/* ---------------- dashboard ---------------- */}
-        <div className={`jt-panel jt-reveal ${dashVisible ? "revealed" : ""}`} ref={dashRef}>
+        <div
+          className="jt-panel jt-reveal"
+          ref={dashRef}
+          style={{ opacity: dashProgress, transform: `translateY(${(1 - dashProgress) * 42}px)` }}
+        >
           <div className="jt-panel-title"><Award size={16} color="var(--gold)" /> Dashboard</div>
           <div className="jt-panel-sub">Overall syllabus progress, subject-wise</div>
 
@@ -1369,7 +1387,7 @@ export default function App() {
               return (
                 <div
                   key={b.id}
-                  className={`jt-badge jt-reveal-child ${earned ? "earned" : ""}`}
+                  className={`jt-badge jt-reveal-child ${dashProgress > 0.45 ? "revealed" : ""} ${earned ? "earned" : ""}`}
                   style={{ transitionDelay: `${0.08 + bi * 0.035}s` }}
                   title={b.desc}
                 >
@@ -1383,7 +1401,11 @@ export default function App() {
         </div>
 
         {/* ---------------- focus mode ---------------- */}
-        <div className={`jt-panel jt-reveal ${focusVisible ? "revealed" : ""}`} ref={focusRef}>
+        <div
+          className="jt-panel jt-reveal"
+          ref={focusRef}
+          style={{ opacity: focusProgress, transform: `translateY(${(1 - focusProgress) * 42}px)` }}
+        >
           <div className="jt-panel-head-row">
             <div>
               <div className="jt-panel-title"><Compass size={16} color="var(--purple-2)" /> Focus Mode — what to study next</div>
@@ -1467,7 +1489,11 @@ export default function App() {
         </div>
 
         {/* ---------------- study hours logger ---------------- */}
-        <div className={`jt-panel jt-reveal ${hoursVisible ? "revealed" : ""}`} ref={hoursRef}>
+        <div
+          className="jt-panel jt-reveal"
+          ref={hoursRef}
+          style={{ opacity: hoursProgress, transform: `translateY(${(1 - hoursProgress) * 42}px)` }}
+        >
           <div className="jt-panel-title"><Clock size={16} color="var(--purple-2)" /> Study Hours Log</div>
           <div className="jt-panel-sub">Log lecture-watching and self-study hours for any date</div>
 
@@ -1572,7 +1598,11 @@ export default function App() {
         </div>
 
         {/* ---------------- mock test tracker ---------------- */}
-        <div className={`jt-panel jt-reveal ${mockVisible ? "revealed" : ""}`} ref={mockRef}>
+        <div
+          className="jt-panel jt-reveal"
+          ref={mockRef}
+          style={{ opacity: mockProgress, transform: `translateY(${(1 - mockProgress) * 42}px)` }}
+        >
           <div className="jt-panel-title"><Rocket size={16} color="var(--gold)" /> Mock Test Tracker</div>
           <div className="jt-panel-sub">Log every full mock so you can see the score trend, not just the last number</div>
 
@@ -1633,8 +1663,9 @@ export default function App() {
 
         {/* ---------------- chapter checklist ---------------- */}
         <div
-          className={`jt-panel jt-reveal ${checklistVisible ? "revealed" : ""}`}
+          className="jt-panel jt-reveal"
           ref={(el) => { checklistRef.current = el; checklistRevealRef.current = el; }}
+          style={{ opacity: checklistProgress, transform: `translateY(${(1 - checklistProgress) * 42}px)` }}
         >
           <div className="jt-panel-title"><BookOpen size={16} color="var(--purple-2)" /> Chapter Checklist</div>
           <div className="jt-panel-sub">Track chapter completion, DPPs, PYQs and revision — chapter by chapter</div>

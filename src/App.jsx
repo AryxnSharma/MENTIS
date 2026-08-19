@@ -13,7 +13,7 @@ import {
    ============================================================ */
 
 const SUBJECT_META = {
-  physics: { label: "Physics", short: "PHY", color: "#8b8dff", glow: "rgba(139,141,255,0.45)" },
+  physics: { label: "Physics", short: "PHY", color: "#8482ff", glow: "rgba(132,130,255,0.45)" },
   pc: { label: "Physical Chemistry", short: "P.Chem", color: "#e0a0c2", glow: "rgba(224,160,194,0.45)" },
   ioc: { label: "Inorganic Chemistry", short: "I.Chem", color: "#e0ac67", glow: "rgba(224,172,103,0.45)" },
   oc: { label: "Organic Chemistry", short: "O.Chem", color: "#3ecf94", glow: "rgba(62,207,148,0.45)" },
@@ -143,14 +143,14 @@ const LOGO_TICKS = Array.from({ length: 5 }, (_, i) => {
 });
 
 const W_COLORS = {
-  High: { bg: "rgba(226,112,138,0.16)", text: "#e2708a", border: "rgba(226,112,138,0.4)" },
-  Medium: { bg: "rgba(245,201,77,0.14)", text: "#f5c94d", border: "rgba(245,201,77,0.4)" },
+  High: { bg: "rgba(255,105,97,0.16)", text: "#ff6961", border: "rgba(255,105,97,0.4)" },
+  Medium: { bg: "rgba(255,203,77,0.14)", text: "#ffcb4d", border: "rgba(255,203,77,0.4)" },
   Low: { bg: "rgba(172,167,192,0.14)", text: "#aca7c0", border: "rgba(172,167,192,0.35)" },
 };
 const D_COLORS = {
   Easy: { bg: "rgba(62,207,148,0.14)", text: "#3ecf94", border: "rgba(62,207,148,0.4)" },
   Medium: { bg: "rgba(94,177,240,0.14)", text: "#5eb1f0", border: "rgba(94,177,240,0.4)" },
-  Hard: { bg: "rgba(226,112,138,0.14)", text: "#e2708a", border: "rgba(226,112,138,0.4)" },
+  Hard: { bg: "rgba(255,105,97,0.14)", text: "#ff6961", border: "rgba(255,105,97,0.4)" },
 };
 
 // IMPORTANT: same key as before — this is what keeps every existing user's
@@ -269,7 +269,7 @@ function fireConfetti(originEl) {
     const ctx = canvas.getContext("2d");
     const cx = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
     const cy = rect ? rect.top + rect.height / 2 : window.innerHeight / 3;
-    const colors = ["#7c7fff", "#e0a45c", "#f5c94d", "#3ecf94", "#5eb1f0"];
+    const colors = ["#7d7aff", "#34d6c4", "#ffcb4d", "#3ecf94", "#5eb1f0"];
     const particles = Array.from({ length: 46 }, () => ({
       x: cx, y: cy,
       vx: (Math.random() - 0.5) * 9,
@@ -345,7 +345,7 @@ export default function App() {
   const checklistRef = useRef(null);
   const tabsWrapRef = useRef(null);
   const tabRefs = useRef({});
-  const [tabIndicator, setTabIndicator] = useState({ left: 0, width: 0, ready: false });
+  const [tabIndicator, setTabIndicator] = useState({ left: 0, top: 0, width: 0, height: 0, ready: false });
   const seenBadgesRef = useRef(null); // null until first computed, so first load never toasts
   const xpBarRef = useRef(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
@@ -371,7 +371,7 @@ export default function App() {
   useEffect(() => {
     const measure = () => {
       const el = tabRefs.current[activeSubject];
-      if (el) setTabIndicator({ left: el.offsetLeft, width: el.offsetWidth, ready: true });
+      if (el) setTabIndicator({ left: el.offsetLeft, top: el.offsetTop, width: el.offsetWidth, height: el.offsetHeight, ready: true });
     };
     measure();
     window.addEventListener("resize", measure);
@@ -689,17 +689,17 @@ export default function App() {
     canvas.width = 1080; canvas.height = 1350;
     const ctx = canvas.getContext("2d");
     const grad = ctx.createLinearGradient(0, 0, 1080, 1350);
-    grad.addColorStop(0, "#050508");
-    grad.addColorStop(0.5, "#100c1c");
-    grad.addColorStop(1, "#050508");
+    grad.addColorStop(0, "#000000");
+    grad.addColorStop(0.5, "#060608");
+    grad.addColorStop(1, "#000000");
     ctx.fillStyle = grad; ctx.fillRect(0, 0, 1080, 1350);
 
-    ctx.fillStyle = "rgba(124,127,255,0.18)";
+    ctx.fillStyle = "rgba(125,122,255,0.18)";
     ctx.beginPath(); ctx.arc(900, 180, 260, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = "rgba(224,164,92,0.13)";
+    ctx.fillStyle = "rgba(52,214,196,0.13)";
     ctx.beginPath(); ctx.arc(120, 1200, 260, 0, Math.PI * 2); ctx.fill();
 
-    ctx.fillStyle = "#f5c94d";
+    ctx.fillStyle = "#ffcb4d";
     ctx.font = "700 30px Segoe UI, sans-serif";
     ctx.fillText("JEE PREP TRACKER", 70, 120);
 
@@ -708,7 +708,7 @@ export default function App() {
     const pct = overall.total ? Math.round((overall.done / overall.total) * 100) : 0;
     ctx.fillText(`${pct}%`, 70, 320);
 
-    ctx.fillStyle = "#c7c5d6";
+    ctx.fillStyle = "#d0d0d8";
     ctx.font = "600 32px Segoe UI, sans-serif";
     ctx.fillText(`${overall.done} / ${overall.total} chapters complete`, 70, 380);
 
@@ -725,7 +725,7 @@ export default function App() {
     rows.forEach(([k, v]) => {
       ctx.fillStyle = "rgba(255,255,255,0.06)";
       ctx.fillRect(70, y - 40, 940, 66);
-      ctx.fillStyle = "#c7c5d6"; ctx.font = "600 26px Segoe UI, sans-serif";
+      ctx.fillStyle = "#d0d0d8"; ctx.font = "600 26px Segoe UI, sans-serif";
       ctx.fillText(k, 100, y);
       ctx.fillStyle = "#ffffff"; ctx.font = "800 28px Segoe UI, sans-serif";
       ctx.fillText(v, 700, y);
@@ -744,8 +744,8 @@ export default function App() {
       ctx.fillText(`${SUBJECT_META[k].short}  ${s.done}/${s.total}`, 84, barY + 24);
     });
 
-    ctx.fillStyle = "#8a8896"; ctx.font = "600 22px Segoe UI, sans-serif";
-    ctx.fillText(`Generated ${formatNiceDate(todayStr())} · Target 240–250/300`, 70, 1300);
+    ctx.fillStyle = "#8e8e93"; ctx.font = "600 22px Segoe UI, sans-serif";
+    ctx.fillText(`Generated ${formatNiceDate(todayStr())} · Target 240–250/300 · OBC-NCL`, 70, 1300);
 
     canvas.toBlob((blob) => {
       const url = URL.createObjectURL(blob);
@@ -760,10 +760,10 @@ export default function App() {
   const heatColor = (v) => {
     if (v <= 0) return "rgba(255,255,255,0.05)";
     const t = Math.min(1, v / maxHeatVal);
-    if (t < 0.25) return "rgba(124,127,255,0.25)";
-    if (t < 0.5) return "rgba(124,127,255,0.45)";
-    if (t < 0.75) return "rgba(124,127,255,0.7)";
-    return "#7c7fff";
+    if (t < 0.25) return "rgba(125,122,255,0.25)";
+    if (t < 0.5) return "rgba(125,122,255,0.45)";
+    if (t < 0.75) return "rgba(125,122,255,0.7)";
+    return "#7d7aff";
   };
 
   return (
@@ -771,22 +771,22 @@ export default function App() {
       <style>{`
         * { box-sizing: border-box; }
         .jt-root {
-          --bg-void: #050508;
-          --bg-panel: rgba(255,255,255,0.035);
-          --bg-panel-hover: rgba(255,255,255,0.06);
-          --border-soft: rgba(124,127,255,0.18);
-          --purple-1: #4f46e5;
-          --purple-2: #7c7fff;
-          --pink: #e0a45c;
-          --gold: #f5c94d;
+          --bg-void: #000000;
+          --bg-panel: rgba(255,255,255,0.045);
+          --bg-panel-hover: rgba(255,255,255,0.075);
+          --border-soft: rgba(125,122,255,0.18);
+          --purple-1: #5e5ce6;
+          --purple-2: #7d7aff;
+          --pink: #34d6c4;
+          --gold: #ffcb4d;
           --text: #ffffff;
-          --text-dim: #c7c5d6;
-          --text-faint: #8a8896;
+          --text-dim: #d0d0d8;
+          --text-faint: #8e8e93;
           font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
           background:
-            radial-gradient(ellipse 80% 50% at 20% -10%, rgba(79,70,229,0.25), transparent),
-            radial-gradient(ellipse 60% 50% at 100% 0%, rgba(224,164,92,0.15), transparent),
-            radial-gradient(ellipse 80% 60% at 50% 120%, rgba(79,70,229,0.15), transparent),
+            radial-gradient(ellipse 80% 50% at 20% -10%, rgba(94,92,230,0.25), transparent),
+            radial-gradient(ellipse 60% 50% at 100% 0%, rgba(52,214,196,0.15), transparent),
+            radial-gradient(ellipse 80% 60% at 50% 120%, rgba(94,92,230,0.15), transparent),
             var(--bg-void);
           color: var(--text);
           min-height: 100svh;
@@ -821,7 +821,7 @@ export default function App() {
         @keyframes barShimmer { 0% { transform: translateX(-120%); } 100% { transform: translateX(260%); } }
         @keyframes badgePop { 0% { opacity: 0; transform: scale(0.5) rotate(-8deg);} 60% { opacity: 1; transform: scale(1.08) rotate(3deg);} 100% { transform: scale(1) rotate(0);} }
         @keyframes toastIn { from { opacity: 0; transform: translate(-50%, -18px) scale(0.92); } to { opacity: 1; transform: translate(-50%, 0) scale(1); } }
-        @keyframes glowPulse { 0%,100% { box-shadow: 0 0 18px var(--card-glow, rgba(124,127,255,0.35)); } 50% { box-shadow: 0 0 32px var(--card-glow, rgba(124,127,255,0.55)); } }
+        @keyframes glowPulse { 0%,100% { box-shadow: 0 0 18px var(--card-glow, rgba(125,122,255,0.35)); } 50% { box-shadow: 0 0 32px var(--card-glow, rgba(125,122,255,0.55)); } }
         @keyframes xpFill { from { width: 0%; } }
         @keyframes ringSpin { from { stroke-dashoffset: 226; } }
         @keyframes float3 { 0%,100% { transform: translateY(0) rotate(0deg);} 50% { transform: translateY(-4px) rotate(1deg);} }
@@ -829,6 +829,11 @@ export default function App() {
         @keyframes logoCheckDraw { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
         @keyframes logoTickIn { from { opacity: 0; transform: scale(0.3); } to { opacity: 1; transform: scale(1); } }
         @keyframes logoSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes glassSheen {
+          0%, 12% { left: -70%; }
+          45% { left: 130%; }
+          100% { left: 130%; }
+        }
 
         .fade-in { animation: fadeInUp 0.5s ease both; }
         .slide-down { animation: slideInDown 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
@@ -852,10 +857,12 @@ export default function App() {
         .jt-toast {
           position: fixed; top: 18px; left: 50%; z-index: 200;
           display: flex; align-items: center; gap: 12px;
-          background: linear-gradient(120deg, rgba(79,70,229,0.94), rgba(224,164,92,0.9));
-          border: 1px solid rgba(255,255,255,0.25);
-          border-radius: 16px; padding: 12px 18px;
-          box-shadow: 0 12px 40px rgba(79,70,229,0.5);
+          background: linear-gradient(120deg, rgba(94,92,230,0.92), rgba(52,214,196,0.88));
+          border: 1px solid rgba(255,255,255,0.28);
+          border-radius: 18px; padding: 12px 18px;
+          backdrop-filter: blur(20px) saturate(180%);
+          -webkit-backdrop-filter: blur(20px) saturate(180%);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 12px 40px rgba(94,92,230,0.5);
           animation: toastIn 0.4s cubic-bezier(0.22,1,0.36,1) both;
           max-width: 92vw;
         }
@@ -871,18 +878,18 @@ export default function App() {
           background: #000;
           border: 1px solid rgba(255,255,255,0.16);
           display: flex; align-items: center; justify-content: center;
-          box-shadow: 0 0 0 1px rgba(124,127,255,0.22), 0 0 26px rgba(124,127,255,0.4);
+          box-shadow: 0 0 0 1px rgba(125,122,255,0.22), 0 0 26px rgba(125,122,255,0.4);
           animation: floatGlow 4s ease-in-out infinite;
           position: relative; overflow: hidden; flex-shrink: 0;
           transition: transform 0.25s cubic-bezier(0.22,1,0.36,1), box-shadow 0.25s ease;
         }
         .jt-brand-badge::before {
           content: ''; position: absolute; inset: -60%;
-          background: conic-gradient(from 0deg, transparent 0%, rgba(124,127,255,0.55) 12%, transparent 26%);
+          background: conic-gradient(from 0deg, transparent 0%, rgba(125,122,255,0.55) 12%, transparent 26%);
           animation: logoSpin 5.5s linear infinite;
           z-index: 0;
         }
-        .jt-brand:hover .jt-brand-badge { transform: scale(1.07); box-shadow: 0 0 0 1px rgba(124,127,255,0.4), 0 0 34px rgba(124,127,255,0.6); }
+        .jt-brand:hover .jt-brand-badge { transform: scale(1.07); box-shadow: 0 0 0 1px rgba(125,122,255,0.4), 0 0 34px rgba(125,122,255,0.6); }
         .jt-logo-svg { position: relative; z-index: 1; }
         .jt-logo-ring { stroke-dashoffset: 226; animation: logoRingDraw 1s cubic-bezier(0.65,0,0.35,1) 0.1s both; }
         .jt-logo-tick { opacity: 0; transform-origin: 50px 48px; animation: logoTickIn 0.35s ease both; }
@@ -894,15 +901,17 @@ export default function App() {
         .jt-save-dot.pulsing { animation: pulseDot 1s ease; }
         .jt-icon-btn {
           display:flex; align-items:center; gap:6px;
-          background: var(--bg-panel); border: 1px solid var(--border-soft);
-          color: var(--text-dim); padding: 7px 12px; border-radius: 9px;
+          background: rgba(255,255,255,0.055); border: 1px solid rgba(255,255,255,0.14);
+          backdrop-filter: blur(16px) saturate(160%);
+          -webkit-backdrop-filter: blur(16px) saturate(160%);
+          color: var(--text-dim); padding: 7px 13px; border-radius: 12px;
           font-size: 12.5px; cursor: pointer; transition: all 0.2s;
         }
-        .jt-icon-btn:hover { background: var(--bg-panel-hover); color: var(--text); border-color: rgba(124,127,255,0.4); transform: translateY(-1px); }
+        .jt-icon-btn:hover { background: rgba(255,255,255,0.09); color: var(--text); border-color: rgba(125,122,255,0.45); transform: translateY(-1px); }
 
         /* ---------- XP bar ---------- */
-        .jt-xp-wrap { display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.28); border: 1px solid var(--border-soft); border-radius: 999px; padding: 6px 14px 6px 8px; }
-        .jt-xp-badge { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), #c9930f); display: flex; align-items: center; justify-content: center; font-size: 12.5px; font-weight: 900; color: #2e2004; flex-shrink: 0; }
+        .jt-xp-wrap { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.055); border: 1px solid rgba(255,255,255,0.14); backdrop-filter: blur(16px) saturate(160%); -webkit-backdrop-filter: blur(16px) saturate(160%); border-radius: 999px; padding: 6px 14px 6px 8px; }
+        .jt-xp-badge { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), #d9a300); display: flex; align-items: center; justify-content: center; font-size: 12.5px; font-weight: 900; color: #2b1e02; flex-shrink: 0; }
         .jt-xp-track { width: 120px; height: 7px; border-radius: 6px; background: rgba(255,255,255,0.1); overflow: hidden; }
         .jt-xp-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--gold), var(--pink)); animation: xpFill 1s cubic-bezier(0.22,1,0.36,1) both; }
         .jt-xp-text { font-size: 10.5px; color: var(--text-faint); white-space: nowrap; }
@@ -910,20 +919,30 @@ export default function App() {
         /* ---------- countdown hero ---------- */
         .jt-hero {
           position: relative;
-          border-radius: 22px;
+          border-radius: 26px;
           padding: 30px 28px;
           margin-bottom: 22px;
-          background: linear-gradient(120deg, rgba(79,70,229,0.35), rgba(224,164,92,0.22), rgba(79,70,229,0.35));
+          background: linear-gradient(120deg, rgba(94,92,230,0.35), rgba(52,214,196,0.22), rgba(94,92,230,0.35));
           background-size: 200% 200%;
           animation: gradientShift 10s ease infinite;
-          border: 1px solid rgba(124,127,255,0.35);
-          box-shadow: 0 0 60px rgba(79,70,229,0.25), inset 0 0 60px rgba(79,70,229,0.06);
+          border: 1px solid rgba(255,255,255,0.18);
+          backdrop-filter: blur(28px) saturate(180%);
+          -webkit-backdrop-filter: blur(28px) saturate(180%);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 0 60px rgba(94,92,230,0.25), inset 0 0 60px rgba(94,92,230,0.06);
           overflow: hidden;
         }
         .jt-hero::after {
           content: ''; position: absolute; top: -40%; right: -10%; width: 320px; height: 320px;
-          background: radial-gradient(circle, rgba(224,164,92,0.35), transparent 70%);
+          background: radial-gradient(circle, rgba(52,214,196,0.35), transparent 70%);
           filter: blur(10px); pointer-events: none;
+        }
+        .jt-hero::before {
+          content: '';
+          position: absolute; top: -20%; left: -70%; width: 40%; height: 140%;
+          background: linear-gradient(100deg, transparent, rgba(255,255,255,0.14), transparent);
+          transform: skewX(-16deg);
+          animation: glassSheen 12s ease-in-out infinite 1.5s;
+          pointer-events: none;
         }
         .jt-hero-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; position: relative; z-index: 1; }
         .jt-hero-label { display:flex; align-items:center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--gold); letter-spacing: 1.5px; text-transform: uppercase; }
@@ -940,20 +959,42 @@ export default function App() {
           border-radius: 14px; padding: 12px 18px; min-width: 150px;
           transition: transform 0.25s ease, border-color 0.25s ease;
         }
-        .jt-hero-date-card:hover { transform: translateY(-3px); border-color: rgba(124,127,255,0.5); }
+        .jt-hero-date-card:hover { transform: translateY(-3px); border-color: rgba(125,122,255,0.5); }
         .jt-hero-date-card .k { font-size: 10.5px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-faint); margin-bottom: 4px; }
         .jt-hero-date-card .v { font-size: 16.5px; font-weight: 700; }
         .jt-hero-date-card .v2 { font-size: 11.5px; color: var(--text-dim); margin-top: 2px; }
 
-        /* ---------- generic panel ---------- */
+        /* ---------- generic panel (liquid glass) ---------- */
         .jt-panel {
-          background: var(--bg-panel);
-          border: 1px solid var(--border-soft);
-          border-radius: 18px;
+          background: linear-gradient(165deg, rgba(255,255,255,0.075), rgba(255,255,255,0.03));
+          border: 1px solid rgba(255,255,255,0.14);
+          border-radius: 24px;
           padding: 20px;
-          backdrop-filter: blur(14px);
+          backdrop-filter: blur(28px) saturate(180%);
+          -webkit-backdrop-filter: blur(28px) saturate(180%);
+          box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.18),
+            inset 0 0 32px rgba(255,255,255,0.02),
+            0 10px 34px rgba(0,0,0,0.4);
           margin-bottom: 20px;
-          transition: border-color 0.3s ease;
+          position: relative;
+          overflow: hidden;
+          transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+        }
+        .jt-panel::before {
+          content: '';
+          position: absolute; top: -20%; left: -70%; width: 45%; height: 140%;
+          background: linear-gradient(100deg, transparent, rgba(255,255,255,0.10), transparent);
+          transform: skewX(-16deg);
+          animation: glassSheen 10s ease-in-out infinite;
+          pointer-events: none;
+        }
+        .jt-panel:hover {
+          border-color: rgba(255,255,255,0.22);
+          box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.24),
+            inset 0 0 32px rgba(255,255,255,0.03),
+            0 14px 40px rgba(0,0,0,0.48);
         }
         .jt-panel-title { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; margin-bottom: 4px; }
         .jt-panel-sub { font-size: 12px; color: var(--text-faint); margin-bottom: 16px; }
@@ -963,8 +1004,8 @@ export default function App() {
         .jt-stat-grid { display: grid; grid-template-columns: 1.3fr repeat(3, 1fr); gap: 14px; margin-bottom: 14px; }
         @media (max-width: 900px) { .jt-stat-grid { grid-template-columns: 1fr 1fr; } }
         .jt-ring-card {
-          background: linear-gradient(145deg, rgba(79,70,229,0.18), rgba(224,164,92,0.10));
-          border: 1px solid rgba(124,127,255,0.3);
+          background: linear-gradient(145deg, rgba(94,92,230,0.18), rgba(52,214,196,0.10));
+          border: 1px solid rgba(125,122,255,0.3);
           border-radius: 16px; padding: 18px; display: flex; align-items: center; gap: 16px;
         }
         .jt-ring { position: relative; width: 84px; height: 84px; flex-shrink: 0; }
@@ -975,10 +1016,14 @@ export default function App() {
         .jt-ring-card .info .t3 { font-size: 11px; color: var(--text-faint); }
 
         .jt-mini-card {
-          background: var(--bg-panel); border: 1px solid var(--border-soft); border-radius: 16px; padding: 14px 16px;
+          background: linear-gradient(165deg, rgba(255,255,255,0.07), rgba(255,255,255,0.025));
+          border: 1px solid rgba(255,255,255,0.13); border-radius: 18px; padding: 14px 16px;
+          backdrop-filter: blur(18px) saturate(170%);
+          -webkit-backdrop-filter: blur(18px) saturate(170%);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.14);
           display: flex; flex-direction: column; gap: 8px; cursor: pointer; transition: all 0.25s cubic-bezier(0.22,1,0.36,1);
         }
-        .jt-mini-card:hover { background: var(--bg-panel-hover); transform: translateY(-3px) scale(1.015); }
+        .jt-mini-card:hover { background: linear-gradient(165deg, rgba(255,255,255,0.1), rgba(255,255,255,0.035)); border-color: rgba(255,255,255,0.2); transform: translateY(-3px) scale(1.015); }
         .jt-mini-card.active { border-color: var(--card-color, var(--purple-2)); animation: glowPulse 2.4s ease-in-out infinite; }
         .jt-mini-card .top { display: flex; align-items: center; justify-content: space-between; }
         .jt-mini-card .name { font-size: 12.5px; font-weight: 700; color: var(--text-dim); }
@@ -1002,7 +1047,7 @@ export default function App() {
           background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
           opacity: 0.35; filter: grayscale(1); transition: all 0.3s ease;
         }
-        .jt-badge.earned { opacity: 1; filter: none; background: rgba(245,201,77,0.08); border-color: rgba(245,201,77,0.35); animation: badgePop 0.5s ease both; }
+        .jt-badge.earned { opacity: 1; filter: none; background: rgba(255,203,77,0.08); border-color: rgba(255,203,77,0.35); animation: badgePop 0.5s ease both; }
         .jt-badge .emoji { font-size: 26px; }
         .jt-badge .label { font-size: 10.5px; font-weight: 700; }
         .jt-badge .desc { font-size: 9px; color: var(--text-faint); line-height: 1.3; }
@@ -1016,32 +1061,34 @@ export default function App() {
         }
         .jt-focus-row:hover { background: rgba(255,255,255,0.06); }
         .jt-focus-left { display: flex; align-items: center; gap: 10px; }
-        .jt-focus-rank { width: 24px; height: 24px; border-radius: 8px; display:flex; align-items:center; justify-content:center; font-size: 11px; font-weight: 800; background: rgba(124,127,255,0.2); color: var(--purple-2); flex-shrink: 0; }
+        .jt-focus-rank { width: 24px; height: 24px; border-radius: 8px; display:flex; align-items:center; justify-content:center; font-size: 11px; font-weight: 800; background: rgba(125,122,255,0.2); color: var(--purple-2); flex-shrink: 0; }
         .jt-focus-name { font-size: 13px; font-weight: 600; }
         .jt-focus-sub { font-size: 10.5px; color: var(--text-faint); }
         .jt-focus-btn { display: flex; align-items: center; gap: 5px; background: rgba(62,207,148,0.14); border: 1px solid rgba(62,207,148,0.4); color: #3ecf94; padding: 6px 11px; border-radius: 8px; font-size: 11.5px; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
         .jt-focus-btn:hover { background: rgba(62,207,148,0.25); transform: translateY(-1px); }
         .jt-focus-picker-list { display: flex; flex-direction: column; gap: 4px; max-height: 260px; overflow-y: auto; }
         .jt-focus-pick-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 12px; border-radius: 10px; cursor: pointer; transition: background 0.15s; border: 1px solid transparent; }
-        .jt-focus-pick-row:hover { background: rgba(124,127,255,0.12); border-color: rgba(124,127,255,0.3); }
+        .jt-focus-pick-row:hover { background: rgba(125,122,255,0.12); border-color: rgba(125,122,255,0.3); }
 
         /* ---------- study hours ---------- */
         .jt-hours-form { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 10px; }
         .jt-field { display: flex; flex-direction: column; gap: 5px; }
         .jt-field label { font-size: 11px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.5px; }
         .jt-input {
-          background: rgba(0,0,0,0.3); border: 1px solid var(--border-soft); color: var(--text);
-          padding: 9px 12px; border-radius: 9px; font-size: 13.5px; outline: none; transition: border 0.2s;
+          background: rgba(255,255,255,0.055); border: 1px solid rgba(255,255,255,0.14); color: var(--text);
+          backdrop-filter: blur(14px) saturate(160%);
+          -webkit-backdrop-filter: blur(14px) saturate(160%);
+          padding: 9px 12px; border-radius: 12px; font-size: 13.5px; outline: none; transition: border 0.2s, background 0.2s;
           width: 140px; max-width: 100%;
         }
-        .jt-input:focus { border-color: var(--purple-2); box-shadow: 0 0 0 3px rgba(124,127,255,0.15); }
+        .jt-input:focus { border-color: var(--purple-2); background: rgba(255,255,255,0.08); box-shadow: 0 0 0 3px rgba(125,122,255,0.15); }
         textarea.jt-input { width: 100%; resize: vertical; min-height: 60px; font-family: inherit; }
         .jt-btn-primary {
           background: linear-gradient(135deg, var(--purple-1), var(--pink));
-          color: white; border: none; padding: 10px 18px; border-radius: 9px; font-size: 13.5px; font-weight: 700;
-          cursor: pointer; box-shadow: 0 4px 16px rgba(124,127,255,0.35); transition: transform 0.15s, box-shadow 0.15s;
+          color: white; border: none; padding: 10px 18px; border-radius: 12px; font-size: 13.5px; font-weight: 700;
+          cursor: pointer; box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 4px 16px rgba(125,122,255,0.35); transition: transform 0.15s, box-shadow 0.15s;
         }
-        .jt-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,127,255,0.5); }
+        .jt-btn-primary:hover { transform: translateY(-1px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 6px 20px rgba(125,122,255,0.5); }
         .jt-form-msg { font-size: 12px; color: var(--gold); margin-left: 4px; }
 
         .jt-view-toggle { display: flex; gap: 4px; background: rgba(0,0,0,0.25); border: 1px solid var(--border-soft); border-radius: 9px; padding: 3px; }
@@ -1058,7 +1105,7 @@ export default function App() {
         .jt-chart-col { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 34px; flex: 1; }
         .jt-chart-bar-wrap { width: 100%; height: 100px; display: flex; flex-direction: column-reverse; border-radius: 6px 6px 3px 3px; overflow: hidden; background: rgba(255,255,255,0.04); }
         .jt-chart-seg-lecture { background: linear-gradient(180deg, var(--purple-2), var(--purple-1)); width: 100%; transition: height 0.4s ease; }
-        .jt-chart-seg-self { background: linear-gradient(180deg, var(--pink), #a66a3f); width: 100%; transition: height 0.4s ease; }
+        .jt-chart-seg-self { background: linear-gradient(180deg, var(--pink), #1fa69a); width: 100%; transition: height 0.4s ease; }
         .jt-chart-date { font-size: 9.5px; color: var(--text-faint); }
         .jt-chart-total { font-size: 9.5px; color: var(--text-dim); font-weight: 700; }
 
@@ -1077,34 +1124,38 @@ export default function App() {
         .jt-log-row .h { color: var(--text-faint); flex: 1; }
         .jt-log-row .total { font-weight: 700; color: var(--gold); margin-right: 10px; }
         .jt-log-del { background: none; border: none; color: var(--text-faint); cursor: pointer; padding: 3px; border-radius: 6px; }
-        .jt-log-del:hover { color: #e2708a; background: rgba(226,112,138,0.12); }
+        .jt-log-del:hover { color: #ff6961; background: rgba(255,105,97,0.12); }
 
         /* ---------- mock tests ---------- */
         .jt-mock-summary { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 16px; }
         .jt-mock-trend { display: flex; align-items: flex-end; gap: 8px; height: 90px; margin: 14px 0; padding: 0 2px; overflow-x: auto; }
         .jt-mock-bar-wrap { display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 30px; flex: 1; }
-        .jt-mock-bar { width: 100%; border-radius: 5px 5px 2px 2px; background: linear-gradient(180deg, var(--gold), #c9930f); transition: height 0.5s cubic-bezier(0.22,1,0.36,1); }
+        .jt-mock-bar { width: 100%; border-radius: 5px 5px 2px 2px; background: linear-gradient(180deg, var(--gold), #d9a300); transition: height 0.5s cubic-bezier(0.22,1,0.36,1); }
         .jt-mock-list { display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto; }
         .jt-mock-row { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 9px; padding: 8px 12px; font-size: 12.5px; gap: 10px; }
         .jt-mock-row .name { font-weight: 700; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .jt-mock-row .score { color: var(--gold); font-weight: 800; white-space: nowrap; }
 
         /* ---------- subject tabs ---------- */
-        .jt-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; position: relative; }
+        .jt-tabs {
+          display: flex; gap: 8px; margin-bottom: 16px; position: relative;
+          flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; -webkit-overflow-scrolling: touch;
+        }
+        .jt-tabs::-webkit-scrollbar { height: 6px; }
         .jt-tab-indicator {
-          position: absolute; top: 0; left: 0; height: 100%;
+          position: absolute; top: 0; left: 0;
           border-radius: 11px;
-          background: linear-gradient(120deg, rgba(124,127,255,0.28), rgba(224,164,92,0.2));
-          border: 1px solid rgba(124,127,255,0.5);
-          box-shadow: 0 0 20px rgba(124,127,255,0.35);
-          transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+          background: linear-gradient(120deg, rgba(125,122,255,0.28), rgba(52,214,196,0.2));
+          border: 1px solid rgba(125,122,255,0.5);
+          box-shadow: 0 0 20px rgba(125,122,255,0.35);
+          transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), width 0.35s cubic-bezier(0.22, 1, 0.36, 1), height 0.35s cubic-bezier(0.22, 1, 0.36, 1);
           pointer-events: none; z-index: 0;
         }
         .jt-tab {
           position: relative; z-index: 1;
-          display: flex; align-items: center; gap: 7px;
+          display: flex; align-items: center; gap: 7px; flex-shrink: 0;
           background: var(--bg-panel); border: 1px solid var(--border-soft); color: var(--text-dim);
-          padding: 9px 15px; border-radius: 11px; font-size: 13px; font-weight: 600; cursor: pointer; transition: color 0.2s;
+          padding: 9px 15px; border-radius: 11px; font-size: 13px; font-weight: 600; cursor: pointer; transition: color 0.2s; white-space: nowrap;
         }
         .jt-tab .badge { font-size: 10.5px; background: rgba(255,255,255,0.08); padding: 2px 7px; border-radius: 999px; }
         .jt-tab.active { color: white; }
@@ -1149,7 +1200,7 @@ export default function App() {
         .jt-check-box.on { background: linear-gradient(135deg, var(--purple-1), var(--pink)); border-color: transparent; animation: popIn 0.25s ease; }
         .jt-check-box.on.revised-on { background: linear-gradient(135deg, #5eb1f0, #3ecf94); }
         .jt-notes-btn { background: none; border: none; color: var(--text-faint); cursor: pointer; padding: 5px; border-radius: 6px; display: flex; align-items: center; transition: all 0.2s; }
-        .jt-notes-btn:hover { color: var(--purple-2); background: rgba(124,127,255,0.12); }
+        .jt-notes-btn:hover { color: var(--purple-2); background: rgba(125,122,255,0.12); }
         .jt-notes-btn.has-notes { color: var(--gold); }
         .jt-notes-box { width: 100%; margin-top: 8px; animation: slideInUpFade 0.25s ease both; }
         .jt-chapter-progress-dot { display: flex; gap: 3px; }
@@ -1161,16 +1212,22 @@ export default function App() {
         /* ---------- footer / modal ---------- */
         .jt-footer { text-align: center; font-size: 11.5px; color: var(--text-faint); margin-top: 26px; }
         .jt-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 20px; }
-        .jt-modal { background: #0c0a14; border: 1px solid var(--border-soft); border-radius: 16px; padding: 24px; max-width: 360px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+        .jt-modal {
+          background: linear-gradient(165deg, rgba(255,255,255,0.09), rgba(255,255,255,0.03)), #050506;
+          border: 1px solid rgba(255,255,255,0.16); border-radius: 22px; padding: 24px; max-width: 360px;
+          backdrop-filter: blur(30px) saturate(180%);
+          -webkit-backdrop-filter: blur(30px) saturate(180%);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), 0 20px 60px rgba(0,0,0,0.6);
+        }
         .jt-modal h3 { margin: 0 0 8px; font-size: 16px; }
         .jt-modal p { font-size: 13px; color: var(--text-dim); margin: 0 0 18px; }
         .jt-modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
         .jt-btn-ghost { background: transparent; border: 1px solid var(--border-soft); color: var(--text-dim); padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 12.5px; }
-        .jt-btn-danger { background: linear-gradient(135deg, #e2708a, #b0546a); color: white; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 12.5px; font-weight: 700; }
-        .jt-error-banner { background: rgba(226,112,138,0.12); border: 1px solid rgba(226,112,138,0.35); color: #f0b9c3; padding: 10px 14px; border-radius: 10px; font-size: 12.5px; margin-bottom: 14px; display:flex; align-items:center; justify-content: space-between; gap: 10px; }
+        .jt-btn-danger { background: linear-gradient(135deg, #ff6961, #c22e2e); color: white; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 12.5px; font-weight: 700; }
+        .jt-error-banner { background: rgba(255,105,97,0.12); border: 1px solid rgba(255,105,97,0.35); color: #ffb3ad; padding: 10px 14px; border-radius: 10px; font-size: 12.5px; margin-bottom: 14px; display:flex; align-items:center; justify-content: space-between; gap: 10px; }
 
         ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-thumb { background: rgba(124,127,255,0.35); border-radius: 8px; }
+        ::-webkit-scrollbar-thumb { background: rgba(125,122,255,0.35); border-radius: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
 
         @media (prefers-reduced-motion: reduce) {
@@ -1223,9 +1280,6 @@ export default function App() {
 
           .jt-log-row { flex-wrap: wrap; gap: 4px 10px; }
           .jt-log-row .d { width: auto; }
-
-          .jt-tabs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; -webkit-overflow-scrolling: touch; }
-          .jt-tab { flex-shrink: 0; }
 
           .jt-legend-row { flex-direction: column; gap: 8px; }
 
@@ -1338,7 +1392,7 @@ export default function App() {
               <div className="jt-hero-date-card">
                 <div className="k">Attempt</div>
                 <div className="v">3rd attempt</div>
-                <div className="v2">Target: 240–250 / 300 </div>
+                <div className="v2">Target: 240–250 / 300 · OBC-NCL</div>
               </div>
             </div>
           </div>
@@ -1367,8 +1421,8 @@ export default function App() {
                   />
                   <defs>
                     <linearGradient id="gradRing" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#7c7fff" />
-                      <stop offset="100%" stopColor="#e0a45c" />
+                      <stop offset="0%" stopColor="#7d7aff" />
+                      <stop offset="100%" stopColor="#34d6c4" />
                     </linearGradient>
                   </defs>
                 </svg>
@@ -1625,10 +1679,10 @@ export default function App() {
               <div className="jt-legend">
                 <span>Less</span>
                 <span className="dot" style={{ background: "rgba(255,255,255,0.05)" }} />
-                <span className="dot" style={{ background: "rgba(124,127,255,0.25)" }} />
-                <span className="dot" style={{ background: "rgba(124,127,255,0.45)" }} />
-                <span className="dot" style={{ background: "rgba(124,127,255,0.7)" }} />
-                <span className="dot" style={{ background: "#7c7fff" }} />
+                <span className="dot" style={{ background: "rgba(125,122,255,0.25)" }} />
+                <span className="dot" style={{ background: "rgba(125,122,255,0.45)" }} />
+                <span className="dot" style={{ background: "rgba(125,122,255,0.7)" }} />
+                <span className="dot" style={{ background: "#7d7aff" }} />
                 <span>More</span>
               </div>
             </>
@@ -1725,7 +1779,11 @@ export default function App() {
             {tabIndicator.ready && (
               <div
                 className="jt-tab-indicator"
-                style={{ transform: `translateX(${tabIndicator.left}px)`, width: tabIndicator.width }}
+                style={{
+                  transform: `translate(${tabIndicator.left}px, ${tabIndicator.top}px)`,
+                  width: tabIndicator.width,
+                  height: tabIndicator.height,
+                }}
               />
             )}
             {SUBJECT_KEYS.map((k) => {

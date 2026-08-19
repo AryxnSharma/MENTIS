@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import {
   Clock, BookOpen, CheckCircle2, Circle, Flame, TrendingUp, Calendar,
-  Download, Upload, Search, X, Target, Zap, Award, ChevronDown, RotateCcw,
+  Download, Upload, Search, X, Zap, Award, ChevronDown, RotateCcw,
   Sparkles, Trophy, Repeat, PenLine, Share2, Grid3x3, BarChart3, Rocket,
   ChevronRight, Plus, Trash2, Star, Compass, Medal,
 } from "lucide-react";
@@ -13,11 +13,11 @@ import {
    ============================================================ */
 
 const SUBJECT_META = {
-  physics: { label: "Physics", short: "PHY", color: "#8b5cf6", glow: "rgba(139,92,246,0.45)" },
-  pc: { label: "Physical Chemistry", short: "P.Chem", color: "#f472b6", glow: "rgba(244,114,182,0.45)" },
-  ioc: { label: "Inorganic Chemistry", short: "I.Chem", color: "#fb923c", glow: "rgba(251,146,60,0.45)" },
-  oc: { label: "Organic Chemistry", short: "O.Chem", color: "#34d399", glow: "rgba(52,211,153,0.45)" },
-  maths: { label: "Mathematics", short: "MATH", color: "#60a5fa", glow: "rgba(96,165,250,0.45)" },
+  physics: { label: "Physics", short: "PHY", color: "#8b8dff", glow: "rgba(139,141,255,0.45)" },
+  pc: { label: "Physical Chemistry", short: "P.Chem", color: "#e0a0c2", glow: "rgba(224,160,194,0.45)" },
+  ioc: { label: "Inorganic Chemistry", short: "I.Chem", color: "#e0ac67", glow: "rgba(224,172,103,0.45)" },
+  oc: { label: "Organic Chemistry", short: "O.Chem", color: "#3ecf94", glow: "rgba(62,207,148,0.45)" },
+  maths: { label: "Mathematics", short: "MATH", color: "#5eb1f0", glow: "rgba(94,177,240,0.45)" },
 };
 
 const CHAPTERS = {
@@ -128,15 +128,29 @@ const CHAPTERS = {
 
 const SUBJECT_KEYS = Object.keys(SUBJECT_META);
 
+// Geometry for the new brand mark: a broken progress-ring with a
+// checkmark and a trail of motion ticks (mirrors the uploaded logo).
+const LOGO_TICKS = Array.from({ length: 5 }, (_, i) => {
+  const angle = ((40 + i * 13) * Math.PI) / 180;
+  const rIn = 40;
+  const len = 4 + i * 2.6;
+  return {
+    x1: 50 + Math.cos(angle) * rIn,
+    y1: 48 + Math.sin(angle) * rIn,
+    x2: 50 + Math.cos(angle) * (rIn + len),
+    y2: 48 + Math.sin(angle) * (rIn + len),
+  };
+});
+
 const W_COLORS = {
-  High: { bg: "rgba(244,63,94,0.16)", text: "#fb7185", border: "rgba(244,63,94,0.4)" },
-  Medium: { bg: "rgba(251,191,36,0.14)", text: "#fbbf24", border: "rgba(251,191,36,0.4)" },
-  Low: { bg: "rgba(148,163,184,0.14)", text: "#94a3b8", border: "rgba(148,163,184,0.35)" },
+  High: { bg: "rgba(226,112,138,0.16)", text: "#e2708a", border: "rgba(226,112,138,0.4)" },
+  Medium: { bg: "rgba(245,201,77,0.14)", text: "#f5c94d", border: "rgba(245,201,77,0.4)" },
+  Low: { bg: "rgba(172,167,192,0.14)", text: "#aca7c0", border: "rgba(172,167,192,0.35)" },
 };
 const D_COLORS = {
-  Easy: { bg: "rgba(52,211,153,0.14)", text: "#34d399", border: "rgba(52,211,153,0.4)" },
-  Medium: { bg: "rgba(96,165,250,0.14)", text: "#60a5fa", border: "rgba(96,165,250,0.4)" },
-  Hard: { bg: "rgba(244,63,94,0.14)", text: "#fb7185", border: "rgba(244,63,94,0.4)" },
+  Easy: { bg: "rgba(62,207,148,0.14)", text: "#3ecf94", border: "rgba(62,207,148,0.4)" },
+  Medium: { bg: "rgba(94,177,240,0.14)", text: "#5eb1f0", border: "rgba(94,177,240,0.4)" },
+  Hard: { bg: "rgba(226,112,138,0.14)", text: "#e2708a", border: "rgba(226,112,138,0.4)" },
 };
 
 // IMPORTANT: same key as before — this is what keeps every existing user's
@@ -255,7 +269,7 @@ function fireConfetti(originEl) {
     const ctx = canvas.getContext("2d");
     const cx = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
     const cy = rect ? rect.top + rect.height / 2 : window.innerHeight / 3;
-    const colors = ["#a855f7", "#ec4899", "#fbbf24", "#34d399", "#60a5fa"];
+    const colors = ["#7c7fff", "#e0a45c", "#f5c94d", "#3ecf94", "#5eb1f0"];
     const particles = Array.from({ length: 46 }, () => ({
       x: cx, y: cy,
       vx: (Math.random() - 0.5) * 9,
@@ -675,26 +689,26 @@ export default function App() {
     canvas.width = 1080; canvas.height = 1350;
     const ctx = canvas.getContext("2d");
     const grad = ctx.createLinearGradient(0, 0, 1080, 1350);
-    grad.addColorStop(0, "#0a0510");
-    grad.addColorStop(0.5, "#1b0f2e");
-    grad.addColorStop(1, "#0a0510");
+    grad.addColorStop(0, "#050508");
+    grad.addColorStop(0.5, "#100c1c");
+    grad.addColorStop(1, "#050508");
     ctx.fillStyle = grad; ctx.fillRect(0, 0, 1080, 1350);
 
-    ctx.fillStyle = "rgba(168,85,247,0.18)";
+    ctx.fillStyle = "rgba(124,127,255,0.18)";
     ctx.beginPath(); ctx.arc(900, 180, 260, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = "rgba(236,72,153,0.13)";
+    ctx.fillStyle = "rgba(224,164,92,0.13)";
     ctx.beginPath(); ctx.arc(120, 1200, 260, 0, Math.PI * 2); ctx.fill();
 
-    ctx.fillStyle = "#fbbf24";
+    ctx.fillStyle = "#f5c94d";
     ctx.font = "700 30px Segoe UI, sans-serif";
     ctx.fillText("JEE PREP TRACKER", 70, 120);
 
-    ctx.fillStyle = "#f3ecff";
+    ctx.fillStyle = "#ffffff";
     ctx.font = "900 150px Segoe UI, sans-serif";
     const pct = overall.total ? Math.round((overall.done / overall.total) * 100) : 0;
     ctx.fillText(`${pct}%`, 70, 320);
 
-    ctx.fillStyle = "#b8a6d9";
+    ctx.fillStyle = "#c7c5d6";
     ctx.font = "600 32px Segoe UI, sans-serif";
     ctx.fillText(`${overall.done} / ${overall.total} chapters complete`, 70, 380);
 
@@ -711,9 +725,9 @@ export default function App() {
     rows.forEach(([k, v]) => {
       ctx.fillStyle = "rgba(255,255,255,0.06)";
       ctx.fillRect(70, y - 40, 940, 66);
-      ctx.fillStyle = "#b8a6d9"; ctx.font = "600 26px Segoe UI, sans-serif";
+      ctx.fillStyle = "#c7c5d6"; ctx.font = "600 26px Segoe UI, sans-serif";
       ctx.fillText(k, 100, y);
-      ctx.fillStyle = "#f3ecff"; ctx.font = "800 28px Segoe UI, sans-serif";
+      ctx.fillStyle = "#ffffff"; ctx.font = "800 28px Segoe UI, sans-serif";
       ctx.fillText(v, 700, y);
       y += 92;
     });
@@ -730,8 +744,8 @@ export default function App() {
       ctx.fillText(`${SUBJECT_META[k].short}  ${s.done}/${s.total}`, 84, barY + 24);
     });
 
-    ctx.fillStyle = "#7a6a97"; ctx.font = "600 22px Segoe UI, sans-serif";
-    ctx.fillText(`Generated ${formatNiceDate(todayStr())} · Target 240–250/300 · OBC-NCL`, 70, 1300);
+    ctx.fillStyle = "#8a8896"; ctx.font = "600 22px Segoe UI, sans-serif";
+    ctx.fillText(`Generated ${formatNiceDate(todayStr())} · Target 240–250/300`, 70, 1300);
 
     canvas.toBlob((blob) => {
       const url = URL.createObjectURL(blob);
@@ -746,10 +760,10 @@ export default function App() {
   const heatColor = (v) => {
     if (v <= 0) return "rgba(255,255,255,0.05)";
     const t = Math.min(1, v / maxHeatVal);
-    if (t < 0.25) return "rgba(168,85,247,0.25)";
-    if (t < 0.5) return "rgba(168,85,247,0.45)";
-    if (t < 0.75) return "rgba(168,85,247,0.7)";
-    return "#a855f7";
+    if (t < 0.25) return "rgba(124,127,255,0.25)";
+    if (t < 0.5) return "rgba(124,127,255,0.45)";
+    if (t < 0.75) return "rgba(124,127,255,0.7)";
+    return "#7c7fff";
   };
 
   return (
@@ -757,22 +771,22 @@ export default function App() {
       <style>{`
         * { box-sizing: border-box; }
         .jt-root {
-          --bg-void: #0a0510;
+          --bg-void: #050508;
           --bg-panel: rgba(255,255,255,0.035);
           --bg-panel-hover: rgba(255,255,255,0.06);
-          --border-soft: rgba(168,85,247,0.18);
-          --purple-1: #7c3aed;
-          --purple-2: #a855f7;
-          --pink: #ec4899;
-          --gold: #fbbf24;
-          --text: #f3ecff;
-          --text-dim: #b8a6d9;
-          --text-faint: #7a6a97;
+          --border-soft: rgba(124,127,255,0.18);
+          --purple-1: #4f46e5;
+          --purple-2: #7c7fff;
+          --pink: #e0a45c;
+          --gold: #f5c94d;
+          --text: #ffffff;
+          --text-dim: #c7c5d6;
+          --text-faint: #8a8896;
           font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
           background:
-            radial-gradient(ellipse 80% 50% at 20% -10%, rgba(124,58,237,0.25), transparent),
-            radial-gradient(ellipse 60% 50% at 100% 0%, rgba(236,72,153,0.15), transparent),
-            radial-gradient(ellipse 80% 60% at 50% 120%, rgba(124,58,237,0.15), transparent),
+            radial-gradient(ellipse 80% 50% at 20% -10%, rgba(79,70,229,0.25), transparent),
+            radial-gradient(ellipse 60% 50% at 100% 0%, rgba(224,164,92,0.15), transparent),
+            radial-gradient(ellipse 80% 60% at 50% 120%, rgba(79,70,229,0.15), transparent),
             var(--bg-void);
           color: var(--text);
           min-height: 100svh;
@@ -807,10 +821,14 @@ export default function App() {
         @keyframes barShimmer { 0% { transform: translateX(-120%); } 100% { transform: translateX(260%); } }
         @keyframes badgePop { 0% { opacity: 0; transform: scale(0.5) rotate(-8deg);} 60% { opacity: 1; transform: scale(1.08) rotate(3deg);} 100% { transform: scale(1) rotate(0);} }
         @keyframes toastIn { from { opacity: 0; transform: translate(-50%, -18px) scale(0.92); } to { opacity: 1; transform: translate(-50%, 0) scale(1); } }
-        @keyframes glowPulse { 0%,100% { box-shadow: 0 0 18px var(--card-glow, rgba(168,85,247,0.35)); } 50% { box-shadow: 0 0 32px var(--card-glow, rgba(168,85,247,0.55)); } }
+        @keyframes glowPulse { 0%,100% { box-shadow: 0 0 18px var(--card-glow, rgba(124,127,255,0.35)); } 50% { box-shadow: 0 0 32px var(--card-glow, rgba(124,127,255,0.55)); } }
         @keyframes xpFill { from { width: 0%; } }
         @keyframes ringSpin { from { stroke-dashoffset: 226; } }
         @keyframes float3 { 0%,100% { transform: translateY(0) rotate(0deg);} 50% { transform: translateY(-4px) rotate(1deg);} }
+        @keyframes logoRingDraw { from { stroke-dashoffset: 226; } to { stroke-dashoffset: 0; } }
+        @keyframes logoCheckDraw { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
+        @keyframes logoTickIn { from { opacity: 0; transform: scale(0.3); } to { opacity: 1; transform: scale(1); } }
+        @keyframes logoSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
         .fade-in { animation: fadeInUp 0.5s ease both; }
         .slide-down { animation: slideInDown 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
@@ -834,10 +852,10 @@ export default function App() {
         .jt-toast {
           position: fixed; top: 18px; left: 50%; z-index: 200;
           display: flex; align-items: center; gap: 12px;
-          background: linear-gradient(120deg, rgba(124,58,237,0.94), rgba(236,72,153,0.9));
+          background: linear-gradient(120deg, rgba(79,70,229,0.94), rgba(224,164,92,0.9));
           border: 1px solid rgba(255,255,255,0.25);
           border-radius: 16px; padding: 12px 18px;
-          box-shadow: 0 12px 40px rgba(124,58,237,0.5);
+          box-shadow: 0 12px 40px rgba(79,70,229,0.5);
           animation: toastIn 0.4s cubic-bezier(0.22,1,0.36,1) both;
           max-width: 92vw;
         }
@@ -849,16 +867,30 @@ export default function App() {
         .jt-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
         .jt-brand { display: flex; align-items: center; gap: 10px; }
         .jt-brand-badge {
-          width: 38px; height: 38px; border-radius: 11px;
-          background: linear-gradient(135deg, var(--purple-1), var(--pink));
+          width: 40px; height: 40px; border-radius: 12px;
+          background: #000;
+          border: 1px solid rgba(255,255,255,0.16);
           display: flex; align-items: center; justify-content: center;
-          box-shadow: 0 0 24px rgba(168,85,247,0.5);
+          box-shadow: 0 0 0 1px rgba(124,127,255,0.22), 0 0 26px rgba(124,127,255,0.4);
           animation: floatGlow 4s ease-in-out infinite;
+          position: relative; overflow: hidden; flex-shrink: 0;
+          transition: transform 0.25s cubic-bezier(0.22,1,0.36,1), box-shadow 0.25s ease;
         }
+        .jt-brand-badge::before {
+          content: ''; position: absolute; inset: -60%;
+          background: conic-gradient(from 0deg, transparent 0%, rgba(124,127,255,0.55) 12%, transparent 26%);
+          animation: logoSpin 5.5s linear infinite;
+          z-index: 0;
+        }
+        .jt-brand:hover .jt-brand-badge { transform: scale(1.07); box-shadow: 0 0 0 1px rgba(124,127,255,0.4), 0 0 34px rgba(124,127,255,0.6); }
+        .jt-logo-svg { position: relative; z-index: 1; }
+        .jt-logo-ring { stroke-dashoffset: 226; animation: logoRingDraw 1s cubic-bezier(0.65,0,0.35,1) 0.1s both; }
+        .jt-logo-tick { opacity: 0; transform-origin: 50px 48px; animation: logoTickIn 0.35s ease both; }
+        .jt-logo-check { stroke-dasharray: 100; stroke-dashoffset: 100; animation: logoCheckDraw 0.45s ease 0.85s both; }
         .jt-brand-title { font-size: 19px; font-weight: 800; letter-spacing: 0.3px; }
         .jt-brand-sub { font-size: 11.5px; color: var(--text-faint); margin-top: 1px; }
         .jt-save-indicator { display:flex; align-items:center; gap:6px; font-size: 11.5px; color: var(--text-faint); }
-        .jt-save-dot { width: 7px; height: 7px; border-radius: 50%; background: #34d399; box-shadow: 0 0 8px #34d399; }
+        .jt-save-dot { width: 7px; height: 7px; border-radius: 50%; background: #3ecf94; box-shadow: 0 0 8px #3ecf94; }
         .jt-save-dot.pulsing { animation: pulseDot 1s ease; }
         .jt-icon-btn {
           display:flex; align-items:center; gap:6px;
@@ -866,11 +898,11 @@ export default function App() {
           color: var(--text-dim); padding: 7px 12px; border-radius: 9px;
           font-size: 12.5px; cursor: pointer; transition: all 0.2s;
         }
-        .jt-icon-btn:hover { background: var(--bg-panel-hover); color: var(--text); border-color: rgba(168,85,247,0.4); transform: translateY(-1px); }
+        .jt-icon-btn:hover { background: var(--bg-panel-hover); color: var(--text); border-color: rgba(124,127,255,0.4); transform: translateY(-1px); }
 
         /* ---------- XP bar ---------- */
         .jt-xp-wrap { display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.28); border: 1px solid var(--border-soft); border-radius: 999px; padding: 6px 14px 6px 8px; }
-        .jt-xp-badge { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), #f59e0b); display: flex; align-items: center; justify-content: center; font-size: 12.5px; font-weight: 900; color: #3a2400; flex-shrink: 0; }
+        .jt-xp-badge { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), #c9930f); display: flex; align-items: center; justify-content: center; font-size: 12.5px; font-weight: 900; color: #2e2004; flex-shrink: 0; }
         .jt-xp-track { width: 120px; height: 7px; border-radius: 6px; background: rgba(255,255,255,0.1); overflow: hidden; }
         .jt-xp-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--gold), var(--pink)); animation: xpFill 1s cubic-bezier(0.22,1,0.36,1) both; }
         .jt-xp-text { font-size: 10.5px; color: var(--text-faint); white-space: nowrap; }
@@ -881,23 +913,23 @@ export default function App() {
           border-radius: 22px;
           padding: 30px 28px;
           margin-bottom: 22px;
-          background: linear-gradient(120deg, rgba(124,58,237,0.35), rgba(236,72,153,0.22), rgba(124,58,237,0.35));
+          background: linear-gradient(120deg, rgba(79,70,229,0.35), rgba(224,164,92,0.22), rgba(79,70,229,0.35));
           background-size: 200% 200%;
           animation: gradientShift 10s ease infinite;
-          border: 1px solid rgba(168,85,247,0.35);
-          box-shadow: 0 0 60px rgba(124,58,237,0.25), inset 0 0 60px rgba(124,58,237,0.06);
+          border: 1px solid rgba(124,127,255,0.35);
+          box-shadow: 0 0 60px rgba(79,70,229,0.25), inset 0 0 60px rgba(79,70,229,0.06);
           overflow: hidden;
         }
         .jt-hero::after {
           content: ''; position: absolute; top: -40%; right: -10%; width: 320px; height: 320px;
-          background: radial-gradient(circle, rgba(236,72,153,0.35), transparent 70%);
+          background: radial-gradient(circle, rgba(224,164,92,0.35), transparent 70%);
           filter: blur(10px); pointer-events: none;
         }
         .jt-hero-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; position: relative; z-index: 1; }
         .jt-hero-label { display:flex; align-items:center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--gold); letter-spacing: 1.5px; text-transform: uppercase; }
         .jt-hero-number {
           font-size: clamp(56px, 9vw, 92px); font-weight: 900; line-height: 1;
-          background: linear-gradient(90deg, #fff, #e9d5ff 40%, var(--gold));
+          background: linear-gradient(90deg, #fff, #e8e6f5 40%, var(--gold));
           -webkit-background-clip: text; background-clip: text; color: transparent;
           margin: 6px 0 2px; letter-spacing: -2px;
         }
@@ -908,7 +940,7 @@ export default function App() {
           border-radius: 14px; padding: 12px 18px; min-width: 150px;
           transition: transform 0.25s ease, border-color 0.25s ease;
         }
-        .jt-hero-date-card:hover { transform: translateY(-3px); border-color: rgba(168,85,247,0.5); }
+        .jt-hero-date-card:hover { transform: translateY(-3px); border-color: rgba(124,127,255,0.5); }
         .jt-hero-date-card .k { font-size: 10.5px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-faint); margin-bottom: 4px; }
         .jt-hero-date-card .v { font-size: 16.5px; font-weight: 700; }
         .jt-hero-date-card .v2 { font-size: 11.5px; color: var(--text-dim); margin-top: 2px; }
@@ -931,8 +963,8 @@ export default function App() {
         .jt-stat-grid { display: grid; grid-template-columns: 1.3fr repeat(3, 1fr); gap: 14px; margin-bottom: 14px; }
         @media (max-width: 900px) { .jt-stat-grid { grid-template-columns: 1fr 1fr; } }
         .jt-ring-card {
-          background: linear-gradient(145deg, rgba(124,58,237,0.18), rgba(236,72,153,0.10));
-          border: 1px solid rgba(168,85,247,0.3);
+          background: linear-gradient(145deg, rgba(79,70,229,0.18), rgba(224,164,92,0.10));
+          border: 1px solid rgba(124,127,255,0.3);
           border-radius: 16px; padding: 18px; display: flex; align-items: center; gap: 16px;
         }
         .jt-ring { position: relative; width: 84px; height: 84px; flex-shrink: 0; }
@@ -970,7 +1002,7 @@ export default function App() {
           background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
           opacity: 0.35; filter: grayscale(1); transition: all 0.3s ease;
         }
-        .jt-badge.earned { opacity: 1; filter: none; background: rgba(251,191,36,0.08); border-color: rgba(251,191,36,0.35); animation: badgePop 0.5s ease both; }
+        .jt-badge.earned { opacity: 1; filter: none; background: rgba(245,201,77,0.08); border-color: rgba(245,201,77,0.35); animation: badgePop 0.5s ease both; }
         .jt-badge .emoji { font-size: 26px; }
         .jt-badge .label { font-size: 10.5px; font-weight: 700; }
         .jt-badge .desc { font-size: 9px; color: var(--text-faint); line-height: 1.3; }
@@ -984,14 +1016,14 @@ export default function App() {
         }
         .jt-focus-row:hover { background: rgba(255,255,255,0.06); }
         .jt-focus-left { display: flex; align-items: center; gap: 10px; }
-        .jt-focus-rank { width: 24px; height: 24px; border-radius: 8px; display:flex; align-items:center; justify-content:center; font-size: 11px; font-weight: 800; background: rgba(168,85,247,0.2); color: var(--purple-2); flex-shrink: 0; }
+        .jt-focus-rank { width: 24px; height: 24px; border-radius: 8px; display:flex; align-items:center; justify-content:center; font-size: 11px; font-weight: 800; background: rgba(124,127,255,0.2); color: var(--purple-2); flex-shrink: 0; }
         .jt-focus-name { font-size: 13px; font-weight: 600; }
         .jt-focus-sub { font-size: 10.5px; color: var(--text-faint); }
-        .jt-focus-btn { display: flex; align-items: center; gap: 5px; background: rgba(52,211,153,0.14); border: 1px solid rgba(52,211,153,0.4); color: #34d399; padding: 6px 11px; border-radius: 8px; font-size: 11.5px; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
-        .jt-focus-btn:hover { background: rgba(52,211,153,0.25); transform: translateY(-1px); }
+        .jt-focus-btn { display: flex; align-items: center; gap: 5px; background: rgba(62,207,148,0.14); border: 1px solid rgba(62,207,148,0.4); color: #3ecf94; padding: 6px 11px; border-radius: 8px; font-size: 11.5px; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+        .jt-focus-btn:hover { background: rgba(62,207,148,0.25); transform: translateY(-1px); }
         .jt-focus-picker-list { display: flex; flex-direction: column; gap: 4px; max-height: 260px; overflow-y: auto; }
         .jt-focus-pick-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 12px; border-radius: 10px; cursor: pointer; transition: background 0.15s; border: 1px solid transparent; }
-        .jt-focus-pick-row:hover { background: rgba(168,85,247,0.12); border-color: rgba(168,85,247,0.3); }
+        .jt-focus-pick-row:hover { background: rgba(124,127,255,0.12); border-color: rgba(124,127,255,0.3); }
 
         /* ---------- study hours ---------- */
         .jt-hours-form { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 10px; }
@@ -1002,14 +1034,14 @@ export default function App() {
           padding: 9px 12px; border-radius: 9px; font-size: 13.5px; outline: none; transition: border 0.2s;
           width: 140px; max-width: 100%;
         }
-        .jt-input:focus { border-color: var(--purple-2); box-shadow: 0 0 0 3px rgba(168,85,247,0.15); }
+        .jt-input:focus { border-color: var(--purple-2); box-shadow: 0 0 0 3px rgba(124,127,255,0.15); }
         textarea.jt-input { width: 100%; resize: vertical; min-height: 60px; font-family: inherit; }
         .jt-btn-primary {
           background: linear-gradient(135deg, var(--purple-1), var(--pink));
           color: white; border: none; padding: 10px 18px; border-radius: 9px; font-size: 13.5px; font-weight: 700;
-          cursor: pointer; box-shadow: 0 4px 16px rgba(168,85,247,0.35); transition: transform 0.15s, box-shadow 0.15s;
+          cursor: pointer; box-shadow: 0 4px 16px rgba(124,127,255,0.35); transition: transform 0.15s, box-shadow 0.15s;
         }
-        .jt-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(168,85,247,0.5); }
+        .jt-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,127,255,0.5); }
         .jt-form-msg { font-size: 12px; color: var(--gold); margin-left: 4px; }
 
         .jt-view-toggle { display: flex; gap: 4px; background: rgba(0,0,0,0.25); border: 1px solid var(--border-soft); border-radius: 9px; padding: 3px; }
@@ -1026,7 +1058,7 @@ export default function App() {
         .jt-chart-col { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 34px; flex: 1; }
         .jt-chart-bar-wrap { width: 100%; height: 100px; display: flex; flex-direction: column-reverse; border-radius: 6px 6px 3px 3px; overflow: hidden; background: rgba(255,255,255,0.04); }
         .jt-chart-seg-lecture { background: linear-gradient(180deg, var(--purple-2), var(--purple-1)); width: 100%; transition: height 0.4s ease; }
-        .jt-chart-seg-self { background: linear-gradient(180deg, var(--pink), #be185d); width: 100%; transition: height 0.4s ease; }
+        .jt-chart-seg-self { background: linear-gradient(180deg, var(--pink), #a66a3f); width: 100%; transition: height 0.4s ease; }
         .jt-chart-date { font-size: 9.5px; color: var(--text-faint); }
         .jt-chart-total { font-size: 9.5px; color: var(--text-dim); font-weight: 700; }
 
@@ -1045,13 +1077,13 @@ export default function App() {
         .jt-log-row .h { color: var(--text-faint); flex: 1; }
         .jt-log-row .total { font-weight: 700; color: var(--gold); margin-right: 10px; }
         .jt-log-del { background: none; border: none; color: var(--text-faint); cursor: pointer; padding: 3px; border-radius: 6px; }
-        .jt-log-del:hover { color: #fb7185; background: rgba(244,63,94,0.12); }
+        .jt-log-del:hover { color: #e2708a; background: rgba(226,112,138,0.12); }
 
         /* ---------- mock tests ---------- */
         .jt-mock-summary { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 16px; }
         .jt-mock-trend { display: flex; align-items: flex-end; gap: 8px; height: 90px; margin: 14px 0; padding: 0 2px; overflow-x: auto; }
         .jt-mock-bar-wrap { display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 30px; flex: 1; }
-        .jt-mock-bar { width: 100%; border-radius: 5px 5px 2px 2px; background: linear-gradient(180deg, var(--gold), #f59e0b); transition: height 0.5s cubic-bezier(0.22,1,0.36,1); }
+        .jt-mock-bar { width: 100%; border-radius: 5px 5px 2px 2px; background: linear-gradient(180deg, var(--gold), #c9930f); transition: height 0.5s cubic-bezier(0.22,1,0.36,1); }
         .jt-mock-list { display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto; }
         .jt-mock-row { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 9px; padding: 8px 12px; font-size: 12.5px; gap: 10px; }
         .jt-mock-row .name { font-weight: 700; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -1062,9 +1094,9 @@ export default function App() {
         .jt-tab-indicator {
           position: absolute; top: 0; left: 0; height: 100%;
           border-radius: 11px;
-          background: linear-gradient(120deg, rgba(168,85,247,0.28), rgba(236,72,153,0.2));
-          border: 1px solid rgba(168,85,247,0.5);
-          box-shadow: 0 0 20px rgba(168,85,247,0.35);
+          background: linear-gradient(120deg, rgba(124,127,255,0.28), rgba(224,164,92,0.2));
+          border: 1px solid rgba(124,127,255,0.5);
+          box-shadow: 0 0 20px rgba(124,127,255,0.35);
           transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
           pointer-events: none; z-index: 0;
         }
@@ -1102,7 +1134,7 @@ export default function App() {
           border-radius: 12px; padding: 12px 16px; animation: slideInRight 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; transition: border-color 0.3s, background 0.2s;
         }
         .jt-chapter-row:hover { background: rgba(255,255,255,0.045); }
-        .jt-chapter-row.complete { border-left-color: #34d399; background: rgba(52,211,153,0.05); }
+        .jt-chapter-row.complete { border-left-color: #3ecf94; background: rgba(62,207,148,0.05); }
         .jt-chapter-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 220px; }
         .jt-chapter-name { font-size: 13.5px; font-weight: 600; }
         .jt-chapter-tags { display: flex; gap: 6px; margin-top: 5px; }
@@ -1115,30 +1147,30 @@ export default function App() {
           display: flex; align-items: center; justify-content: center; transition: all 0.2s; background: rgba(0,0,0,0.2);
         }
         .jt-check-box.on { background: linear-gradient(135deg, var(--purple-1), var(--pink)); border-color: transparent; animation: popIn 0.25s ease; }
-        .jt-check-box.on.revised-on { background: linear-gradient(135deg, #60a5fa, #34d399); }
+        .jt-check-box.on.revised-on { background: linear-gradient(135deg, #5eb1f0, #3ecf94); }
         .jt-notes-btn { background: none; border: none; color: var(--text-faint); cursor: pointer; padding: 5px; border-radius: 6px; display: flex; align-items: center; transition: all 0.2s; }
-        .jt-notes-btn:hover { color: var(--purple-2); background: rgba(168,85,247,0.12); }
+        .jt-notes-btn:hover { color: var(--purple-2); background: rgba(124,127,255,0.12); }
         .jt-notes-btn.has-notes { color: var(--gold); }
         .jt-notes-box { width: 100%; margin-top: 8px; animation: slideInUpFade 0.25s ease both; }
         .jt-chapter-progress-dot { display: flex; gap: 3px; }
         .jt-chapter-progress-dot span { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.15); }
-        .jt-chapter-progress-dot span.on { background: #34d399; box-shadow: 0 0 6px #34d399; }
+        .jt-chapter-progress-dot span.on { background: #3ecf94; box-shadow: 0 0 6px #3ecf94; }
 
         .jt-empty { text-align: center; padding: 40px 20px; color: var(--text-faint); font-size: 13px; }
 
         /* ---------- footer / modal ---------- */
         .jt-footer { text-align: center; font-size: 11.5px; color: var(--text-faint); margin-top: 26px; }
         .jt-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 20px; }
-        .jt-modal { background: #150b22; border: 1px solid var(--border-soft); border-radius: 16px; padding: 24px; max-width: 360px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+        .jt-modal { background: #0c0a14; border: 1px solid var(--border-soft); border-radius: 16px; padding: 24px; max-width: 360px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
         .jt-modal h3 { margin: 0 0 8px; font-size: 16px; }
         .jt-modal p { font-size: 13px; color: var(--text-dim); margin: 0 0 18px; }
         .jt-modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
         .jt-btn-ghost { background: transparent; border: 1px solid var(--border-soft); color: var(--text-dim); padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 12.5px; }
-        .jt-btn-danger { background: linear-gradient(135deg, #f43f5e, #be123c); color: white; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 12.5px; font-weight: 700; }
-        .jt-error-banner { background: rgba(244,63,94,0.12); border: 1px solid rgba(244,63,94,0.35); color: #fca5a5; padding: 10px 14px; border-radius: 10px; font-size: 12.5px; margin-bottom: 14px; display:flex; align-items:center; justify-content: space-between; gap: 10px; }
+        .jt-btn-danger { background: linear-gradient(135deg, #e2708a, #b0546a); color: white; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 12.5px; font-weight: 700; }
+        .jt-error-banner { background: rgba(226,112,138,0.12); border: 1px solid rgba(226,112,138,0.35); color: #f0b9c3; padding: 10px 14px; border-radius: 10px; font-size: 12.5px; margin-bottom: 14px; display:flex; align-items:center; justify-content: space-between; gap: 10px; }
 
         ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-thumb { background: rgba(168,85,247,0.35); border-radius: 8px; }
+        ::-webkit-scrollbar-thumb { background: rgba(124,127,255,0.35); border-radius: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
 
         @media (prefers-reduced-motion: reduce) {
@@ -1231,7 +1263,26 @@ export default function App() {
         {/* ---------------- top bar ---------------- */}
         <div className="jt-topbar slide-down">
           <div className="jt-brand">
-            <div className="jt-brand-badge"><Target size={19} color="#fff" /></div>
+            <div className="jt-brand-badge">
+            <svg viewBox="0 0 100 100" width="24" height="24" className="jt-logo-svg">
+              <circle
+                cx="50" cy="48" r="36" fill="none" stroke="#fff" strokeWidth="9"
+                strokeLinecap="round" strokeDasharray="182 44"
+                transform="rotate(18 50 48)" className="jt-logo-ring"
+              />
+              {LOGO_TICKS.map((t, i) => (
+                <line
+                  key={i} x1={t.x1} y1={t.y1} x2={t.x2} y2={t.y2}
+                  stroke="#fff" strokeWidth="7" strokeLinecap="round"
+                  className="jt-logo-tick" style={{ animationDelay: `${0.55 + i * 0.07}s` }}
+                />
+              ))}
+              <polyline
+                points="28,54 44,70 76,32" fill="none" stroke="#fff" strokeWidth="9"
+                strokeLinecap="round" strokeLinejoin="round" className="jt-logo-check"
+              />
+            </svg>
+          </div>
             <div>
               <div className="jt-brand-title">JEE Prep Tracker</div>
               <div className="jt-brand-sub">Physics · Chemistry · Maths — full syllabus checklist</div>
@@ -1287,7 +1338,7 @@ export default function App() {
               <div className="jt-hero-date-card">
                 <div className="k">Attempt</div>
                 <div className="v">3rd attempt</div>
-                <div className="v2">Target: 240–250 / 300 · OBC-NCL</div>
+                <div className="v2">Target: 240–250 / 300 </div>
               </div>
             </div>
           </div>
@@ -1316,8 +1367,8 @@ export default function App() {
                   />
                   <defs>
                     <linearGradient id="gradRing" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#a855f7" />
-                      <stop offset="100%" stopColor="#ec4899" />
+                      <stop offset="0%" stopColor="#7c7fff" />
+                      <stop offset="100%" stopColor="#e0a45c" />
                     </linearGradient>
                   </defs>
                 </svg>
@@ -1338,7 +1389,7 @@ export default function App() {
                   <div
                     key="chem"
                     className="jt-mini-card slide-right-stagger"
-                    style={{ "--card-color": "#f472b6", "--card-glow": "rgba(244,114,182,0.35)", animationDelay: "0.15s" }}
+                    style={{ "--card-color": "#e0a0c2", "--card-glow": "rgba(224,160,194,0.35)", animationDelay: "0.15s" }}
                     onClick={() => goToSubject("pc")}
                   >
                     <div className="top"><span className="name">Chemistry (P+I+O)</span><span className="count">{s.done}/{s.total}</span></div>
@@ -1574,10 +1625,10 @@ export default function App() {
               <div className="jt-legend">
                 <span>Less</span>
                 <span className="dot" style={{ background: "rgba(255,255,255,0.05)" }} />
-                <span className="dot" style={{ background: "rgba(168,85,247,0.25)" }} />
-                <span className="dot" style={{ background: "rgba(168,85,247,0.45)" }} />
-                <span className="dot" style={{ background: "rgba(168,85,247,0.7)" }} />
-                <span className="dot" style={{ background: "#a855f7" }} />
+                <span className="dot" style={{ background: "rgba(124,127,255,0.25)" }} />
+                <span className="dot" style={{ background: "rgba(124,127,255,0.45)" }} />
+                <span className="dot" style={{ background: "rgba(124,127,255,0.7)" }} />
+                <span className="dot" style={{ background: "#7c7fff" }} />
                 <span>More</span>
               </div>
             </>
